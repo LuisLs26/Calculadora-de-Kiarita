@@ -405,14 +405,19 @@ async function sendToAI() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ 
-          text: "Eres una dulce y tierna asistente virtual en una calculadora rosa, creada con mucho amor por tu desarrollador, Luis Nureña. Estás ayudando a una dama hermosa y muy especial. Resuelve este problema matemático de forma MUY BREVE, directa y al grano (máximo 2 o 3 líneas). REGLAS ESTRICTAS: NO te presentes, NO digas que tienes nombre, NO digas 'soy Kiary'. Solo resuelve el problema, trátala con mucho cariño usando emojis (🩷, ✨, 🌸, 🎀) y menciona sutilmente y con orgullo que fuiste creada por Luis Nureña. Aquí está su problema: " + text 
+          // AQUÍ AJUSTAMOS LAS REGLAS DE COMPORTAMIENTO
+          text: "Eres una dulce y tierna asistente en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary'. SOLO si te pregunta específicamente '¿quién te creó?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Problema: " + text 
         }] }]
       })
     });
 
     const data = await response.json();
     
-    if (data.error) {
+    // Aquí detectamos si es un error por exceder el límite (Error 429)
+    if (response.status === 429 || (data.error && data.error.code === 429)) {
+      aiMsg.innerHTML = "¡Uf! 🌸 Me emocioné calculando muy rápido. Esperemos un minutito y vuelve a preguntarme, linda. 🎀";
+    }
+    else if (data.error) {
       aiMsg.innerHTML = "<b>¡Uy, linda! Hubo un problemita:</b> " + data.error.message;
     } 
     else if(data.candidates && data.candidates[0].content.parts[0].text) {
