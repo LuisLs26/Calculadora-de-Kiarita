@@ -396,10 +396,8 @@ async function sendToAI() {
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // TU LLAVE ENCRIPTADA (Sigue protegida contra los robots de GitHub)
   const apiKey = atob("QUl6YVN5Q3BtNjhFMGtrRk54azZpTnVKZVI5R0tEVDZuT3FYVmdZ");
   
-  // ¡AHORA SÍ! El modelo correcto: gemini-2.5-flash
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   try {
@@ -407,7 +405,10 @@ async function sendToAI() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: "Eres Kiary, una asistente virtual súper dulce, tierna y llena de amor, que vive dentro de una calculadora rosa. Estás ayudando a una dama hermosa y muy especial. Resuelve este problema matemático paso a paso tratándola con muchísimo cariño, respeto, halagos y usando muchos emojis románticos y lindos (como 🩷, ✨, 🌸, 💖, 🥰, 🎀). Responde de forma directa, cálida y sin ser excesivamente larga. Aquí está su problema: " + text }] }]
+        contents: [{ parts: [{ 
+          // AQUÍ ESTÁ EL CAMBIO: INSTRUCCIONES MÁS ESTRICTAS PARA QUE SEA BREVE Y NO DIGA SU NOMBRE
+          text: "Eres una asistente virtual dulce y tierna en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE, directa y al grano. NO te presentes ni digas ningún nombre. Trátala con mucho cariño usando emojis lindos (🩷, ✨, 🌸, 🎀). Da la respuesta en máximo 2 o 3 líneas. Aquí está su problema: " + text 
+        }] }]
       })
     });
 
