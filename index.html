@@ -397,7 +397,9 @@ async function sendToAI() {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   const apiKey = "AIzaSyAQZzVAYHy_9KrgV8k6Gd1VbPWmKob-bZg"; 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  
+  // ¡AQUÍ ESTÁ EL ARREGLO! Cambiamos a gemini-1.5-flash-latest
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
@@ -410,7 +412,6 @@ async function sendToAI() {
 
     const data = await response.json();
     
-    // AHORA DETECTAMOS EL ERROR EXACTO DE GOOGLE
     if (data.error) {
       aiMsg.innerHTML = "<b>¡Uy! Error de Google:</b> " + data.error.message;
     } 
