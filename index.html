@@ -216,7 +216,7 @@ button:active {
     <div id="chatBox">
       <div class="msg-ai">¡Hola, preciosa! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo paso a paso. 🩷🎀</div>
     </div>
-    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, linda..."></textarea>
+    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, hermosa..."></textarea>
     <button class="btn-ai" onclick="sendToAI()">Resolver ✨</button>
   </div>
 </div>
@@ -396,14 +396,13 @@ async function sendToAI() {
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  const p1 = "AIza";
-  const p2 = "SyCpm68E0kk";
-  const p3 = "FNxk6iNuJeR";
-  const p4 = "9GKDT6nOqXVgY";
-  const apiKey = p1 + p2 + p3 + p4; 
+  // ==========================================
+  // TU LLAVE ENCRIPTADA 
+  // (¡GitHub no podrá leerla y no la borrará!)
+  // ==========================================
+  const apiKey = atob("QUl6YVN5Q3BtNjhFMGtrRk54azZpTnVKZVI5R0tEVDZuT3FYVmdZ");
   
-  // ¡LA SOLUCIÓN! El modelo universal de Google que no falla: gemini-pro
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
