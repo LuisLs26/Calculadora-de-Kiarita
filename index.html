@@ -398,8 +398,8 @@ async function sendToAI() {
 
   const apiKey = "AIzaSyAQZzVAYHy_9KrgV8k6Gd1VbPWmKob-bZg"; 
   
-  // ¡AQUÍ ESTÁ EL ARREGLO! Cambiamos a gemini-1.5-flash-latest
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+  // ¡LA SOLUCIÓN! Usamos la versión de IA actualizada: gemini-2.5-flash
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
