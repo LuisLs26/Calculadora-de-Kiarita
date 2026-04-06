@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Calculadora de Kiara</title>
+<title>Calculadora de Kiary ❤️</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
@@ -20,39 +20,13 @@ body {
   overflow: hidden;
 }
 
-/* Cabecera y Selector de Modo */
 .header {
   text-align: center;
-  padding: 15px 15px 5px 15px;
+  padding: 20px 15px;
   background: #ff1493;
   color: white;
   font-size: 1.65rem;
   font-weight: bold;
-}
-
-.mode-selector {
-  background: #ff1493;
-  text-align: center;
-  padding-bottom: 15px;
-}
-
-.mode-selector select {
-  padding: 5px 10px;
-  border-radius: 15px;
-  border: 2px solid white;
-  background: #ff99cc;
-  color: #fff;
-  font-family: inherit;
-  font-weight: bold;
-  font-size: 1rem;
-  outline: none;
-}
-
-/* --- MODO NORMAL --- */
-#normalMode {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
 }
 
 .display {
@@ -92,83 +66,12 @@ button:active {
 .special { background: #ffe6f2; color: #c71585; }
 .zero { grid-column: span 2; }
 
-/* --- MODO MATEMÁTICAS AVANZADAS --- */
-#advancedMode {
-  display: none; /* Oculto por defecto */
-  flex: 1;
-  background: #fff0f5;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.adv-container {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(255,20,147,0.2);
-}
-
-.adv-container h3 {
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.topic-selector {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 2px solid #ffb3d1;
-  border-radius: 10px;
-  font-family: inherit;
-  color: #c71585;
-}
-
-.input-group {
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.input-group label {
-  font-weight: bold;
-  width: 40%;
-}
-
-.input-group input {
-  width: 55%;
-  padding: 8px;
-  border: 2px solid #ffb3d1;
-  border-radius: 8px;
-  font-family: inherit;
-}
-
-.btn-resolver {
-  width: 100%;
-  padding: 15px;
-  background: #ff1493;
-  color: white;
-  font-weight: bold;
-  border-radius: 10px;
-  margin-top: 15px;
-  font-size: 1.2rem;
-}
-
-.adv-result {
-  margin-top: 20px;
-  padding: 15px;
-  background: #ffe6f2;
-  border-radius: 10px;
-  border-left: 5px solid #ff1493;
-  white-space: pre-line;
-  line-height: 1.5;
-}
-
-/* Extras */
 .footer {
   text-align: center;
   padding: 10px;
   background: #ff99cc;
+  color: #c71585;
+  font-weight: bold;
 }
 
 #heartContainer {
@@ -181,58 +84,26 @@ button:active {
 
 .heart {
   position: absolute;
-  animation: floatHeart 2s forwards;
-  font-size: 24px;
+  animation: floatHeart ease-in forwards;
 }
 
 @keyframes floatHeart {
-  from { transform: translateY(0) scale(1); opacity: 1; }
-  to { transform: translateY(-400px) scale(1.5); opacity: 0; }
+  0% { transform: translateY(0) scale(0.8); opacity: 1; }
+  50% { transform: translateY(-250px) scale(1.3); opacity: 0.9; }
+  100% { transform: translateY(-600px) scale(1.8); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">Calculadora de Kiara</div>
-
-<div class="mode-selector">
-  <select id="modeSelect" onchange="switchMode()">
-    <option value="normal">Modo Normal</option>
-    <option value="avanzado">Matemáticas Avanzadas</option>
-  </select>
-</div>
-
-<div id="normalMode">
-  <div id="display" class="display">0</div>
-  <div class="buttons" id="buttonsContainer"></div>
-</div>
-
-<div id="advancedMode">
-  <div class="adv-container">
-    <h3>Selecciona un Tema</h3>
-    <select class="topic-selector" id="topicSelect" onchange="loadTopicInputs()">
-      <option value="">-- Elige un tema --</option>
-      <option value="ecuacion2">Ecuación de 2do Grado (Fórmula General)</option>
-      <option value="pitagoras">Teorema de Pitágoras</option>
-      <option value="reglatres">Regla de Tres Simple</option>
-    </select>
-
-    <div id="dynamicInputs"></div>
-    
-    <button class="btn-resolver" id="btnResolver" style="display:none;" onclick="solveAdvanced()">¡Resolver!</button>
-
-    <div id="advResult" class="adv-result" style="display:none;"></div>
-  </div>
-</div>
-
-<div class="footer">Hecho con ❤️</div>
+<div class="header">Calculadora de Kiary ❤️</div>
+<div id="display" class="display">0</div>
+<div class="buttons" id="buttonsContainer"></div>
+<div class="footer">¡Mucho amor! ❤️</div>
 <div id="heartContainer"></div>
 
 <script>
-// ==========================================
-// LÓGICA DE LA CALCULADORA NORMAL
-// ==========================================
 const display = document.getElementById('display');
 const buttonsContainer = document.getElementById('buttonsContainer');
 const heartContainer = document.getElementById('heartContainer');
@@ -244,7 +115,7 @@ let operator = '';
 const speechMap = {
  '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
  '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
- '+':'más','−':'menos','×':'por','÷':'dividido'
+ '+':'más','−':'menos','×':'por','÷':'dividido', '%':'porcentaje'
 };
 
 function speak(text){
@@ -286,14 +157,25 @@ function calculate(){
 }
 
 function showHearts(){
- for(let i=0;i<20;i++){
-   let h=document.createElement('div');
-   h.className='heart';
-   h.innerHTML='❤️';
-   h.style.left=Math.random()*100+'vw';
-   h.style.bottom='0';
+ // Genera 50 corazones con tamaños, posiciones y velocidades aleatorias
+ for(let i=0; i<50; i++){
+   let h = document.createElement('div');
+   h.className = 'heart';
+   h.innerHTML = '❤️';
+   
+   // Posición horizontal aleatoria
+   h.style.left = Math.random() * 100 + 'vw';
+   // Posición vertical ligeramente aleatoria cerca del fondo
+   h.style.bottom = (Math.random() * -30) + 'px';
+   // Tamaños aleatorios entre 15px y 40px
+   h.style.fontSize = (Math.random() * 25 + 15) + 'px';
+   // Velocidad de animación aleatoria entre 1.5s y 3s
+   h.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+   
    heartContainer.appendChild(h);
-   setTimeout(()=>h.remove(),2000);
+   
+   // Se eliminan después de que termina la animación
+   setTimeout(() => h.remove(), 3500);
  }
 }
 
@@ -306,19 +188,20 @@ function handleButton(val){
  else if(val === '.'){
    if(!currentInput.includes('.')) currentInput += '.';
  }
- // EL BUG DEL % ARREGLADO AQUÍ:
  else if(val === '%'){
    currentInput = (parseFloat(currentInput) / 100).toString();
+   showHearts(); // Corazones al presionar %
  }
  else if(['+','−','×','÷'].includes(val)){
    previousInput = currentInput;
    operator = val;
    currentInput = '0';
+   showHearts(); // Corazones al presionar +, -, ×, ÷
  }
  else if(val === '='){
    if(operator){
      calculate();
-     showHearts();
+     showHearts(); // Corazones al presionar =
      speak("resultado " + currentInput);
    }
  }
@@ -358,151 +241,6 @@ values.forEach(v=>{
 });
 
 updateDisplay();
-
-// ==========================================
-// LÓGICA DEL MODO MATEMÁTICAS AVANZADAS
-// ==========================================
-
-function switchMode() {
-  const mode = document.getElementById("modeSelect").value;
-  if(mode === "normal") {
-    document.getElementById("normalMode").style.display = "flex";
-    document.getElementById("advancedMode").style.display = "none";
-  } else {
-    document.getElementById("normalMode").style.display = "none";
-    document.getElementById("advancedMode").style.display = "block";
-  }
-}
-
-// Diccionario de temas. ¡Aquí puedes agregar todos los que quieras!
-const advancedTopics = {
-  "ecuacion2": {
-    inputs: [
-      { id: "valA", label: "Valor de 'a' (x²)" },
-      { id: "valB", label: "Valor de 'b' (x)" },
-      { id: "valC", label: "Valor de 'c' (independiente)" }
-    ],
-    solve: function() {
-      let a = parseFloat(document.getElementById("valA").value);
-      let b = parseFloat(document.getElementById("valB").value);
-      let c = parseFloat(document.getElementById("valC").value);
-      
-      if(isNaN(a) || isNaN(b) || isNaN(c)) return "Por favor, llena todos los campos.";
-      if(a === 0) return "Si 'a' es 0, no es una ecuación de segundo grado.";
-
-      let discriminante = (b*b) - (4*a*c);
-      let pasos = `Fórmula: x = (-b ± √(b² - 4ac)) / 2a\n\n`;
-      pasos += `1. Sustituimos: x = (-(${b}) ± √(${b}² - 4(${a})(${c}))) / 2(${a})\n`;
-      pasos += `2. Calculamos discriminante: Δ = ${discriminante}\n\n`;
-
-      if(discriminante > 0) {
-        let x1 = (-b + Math.sqrt(discriminante)) / (2*a);
-        let x2 = (-b - Math.sqrt(discriminante)) / (2*a);
-        pasos += `Hay dos soluciones reales:\nx1 = ${x1.toFixed(4)}\nx2 = ${x2.toFixed(4)}\n\n¡Facilísimo, verdad!`;
-      } else if (discriminante === 0) {
-        let x = -b / (2*a);
-        pasos += `Hay una solución única:\nx = ${x.toFixed(4)}\n\n¡Facilísimo, verdad!`;
-      } else {
-        pasos += `El discriminante es negativo. Las soluciones son números imaginarios/complejos.\n\n¡Facilísimo, verdad!`;
-      }
-      return pasos;
-    }
-  },
-  
-  "pitagoras": {
-    inputs: [
-      { id: "catA", label: "Cateto A (deja en blanco si no lo sabes)" },
-      { id: "catB", label: "Cateto B (deja en blanco si no lo sabes)" },
-      { id: "hipH", label: "Hipotenusa H (deja en blanco si no lo sabes)" }
-    ],
-    solve: function() {
-      let a = document.getElementById("catA").value;
-      let b = document.getElementById("catB").value;
-      let h = document.getElementById("hipH").value;
-      
-      let pasos = `Teorema: c² = a² + b²\n\n`;
-
-      if(a === "" && b !== "" && h !== "") {
-        b = parseFloat(b); h = parseFloat(h);
-        let res = Math.sqrt((h*h) - (b*b));
-        pasos += `Falta Cateto A.\na = √(h² - b²)\na = √(${h}² - ${b}²)\na = ${res.toFixed(4)}`;
-      } else if (b === "" && a !== "" && h !== "") {
-        a = parseFloat(a); h = parseFloat(h);
-        let res = Math.sqrt((h*h) - (a*a));
-        pasos += `Falta Cateto B.\nb = √(h² - a²)\nb = √(${h}² - ${a}²)\nb = ${res.toFixed(4)}`;
-      } else if (h === "" && a !== "" && b !== "") {
-        a = parseFloat(a); b = parseFloat(b);
-        let res = Math.sqrt((a*a) + (b*b));
-        pasos += `Falta Hipotenusa.\nh = √(a² + b²)\nh = √(${a}² + ${b}²)\nh = ${res.toFixed(4)}`;
-      } else {
-        return "Debes llenar exactamente DOS casillas para calcular la tercera.";
-      }
-      return pasos + "\n\n¡Facilísimo, verdad!";
-    }
-  },
-
-  "reglatres": {
-    inputs: [
-      { id: "valA1", label: "Si A es..." },
-      { id: "valB1", label: "...entonces B es:" },
-      { id: "valA2", label: "Si tengo A2..." },
-    ],
-    solve: function() {
-      let a1 = parseFloat(document.getElementById("valA1").value);
-      let b1 = parseFloat(document.getElementById("valB1").value);
-      let a2 = parseFloat(document.getElementById("valA2").value);
-
-      if(isNaN(a1) || isNaN(b1) || isNaN(a2)) return "Por favor, llena los 3 datos.";
-
-      let x = (b1 * a2) / a1;
-      let pasos = `Planteamiento:\n${a1} ---> ${b1}\n${a2} ---> X\n\n`;
-      pasos += `Operación: X = (${b1} × ${a2}) / ${a1}\n`;
-      pasos += `Resultado: X = ${x.toFixed(4)}\n\n¡Facilísimo, verdad!`;
-      
-      return pasos;
-    }
-  }
-};
-
-function loadTopicInputs() {
-  const select = document.getElementById("topicSelect").value;
-  const container = document.getElementById("dynamicInputs");
-  const btn = document.getElementById("btnResolver");
-  const res = document.getElementById("advResult");
-  
-  container.innerHTML = "";
-  res.style.display = "none";
-  res.innerHTML = "";
-
-  if(select === "") {
-    btn.style.display = "none";
-    return;
-  }
-
-  const topicData = advancedTopics[select];
-  topicData.inputs.forEach(inp => {
-    container.innerHTML += `
-      <div class="input-group">
-        <label for="${inp.id}">${inp.label}</label>
-        <input type="number" id="${inp.id}" placeholder="0">
-      </div>
-    `;
-  });
-
-  btn.style.display = "block";
-}
-
-function solveAdvanced() {
-  const select = document.getElementById("topicSelect").value;
-  const resBox = document.getElementById("advResult");
-  
-  if(select !== "") {
-    const resultText = advancedTopics[select].solve();
-    resBox.innerHTML = resultText;
-    resBox.style.display = "block";
-    showHearts();
-  }
-}
 </script>
 
 </body>
