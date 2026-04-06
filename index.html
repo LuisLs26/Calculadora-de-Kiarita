@@ -20,7 +20,6 @@ body {
   overflow: hidden;
 }
 
-/* Cabecera y Selector de Modo */
 .header {
   text-align: center;
   padding: 15px 15px 5px 15px;
@@ -49,7 +48,6 @@ body {
   cursor: pointer;
 }
 
-/* --- MODO NORMAL --- */
 #normalMode {
   display: flex;
   flex-direction: column;
@@ -93,7 +91,6 @@ button:active {
 .special { background: #ffe6f2; color: #c71585; }
 .zero { grid-column: span 2; }
 
-/* --- MODO IA AVANZADO --- */
 #aiMode {
   display: none; 
   flex: 1;
@@ -175,7 +172,6 @@ button:active {
   cursor: pointer;
 }
 
-/* Efecto de Escarcha Rosada */
 #heartContainer {
   position: fixed;
   width: 100%;
@@ -228,9 +224,6 @@ button:active {
 <div id="heartContainer"></div>
 
 <script>
-// ==========================================
-// LÓGICA DE LA CALCULADORA NORMAL
-// ==========================================
 const display = document.getElementById('display');
 const buttonsContainer = document.getElementById('buttonsContainer');
 const heartContainer = document.getElementById('heartContainer');
@@ -370,10 +363,6 @@ values.forEach(v=>{
 
 updateDisplay();
 
-// ==========================================
-// LÓGICA DEL MODO IA
-// ==========================================
-
 function switchMode() {
   const mode = document.getElementById("modeSelect").value;
   if(mode === "normal") {
@@ -392,7 +381,6 @@ async function sendToAI() {
 
   const chatBox = document.getElementById("chatBox");
 
-  // Mensaje del usuario
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
   userMsg.textContent = text;
@@ -402,14 +390,12 @@ async function sendToAI() {
   chatBox.scrollTop = chatBox.scrollHeight;
   showGlitter();
 
-  // Mensaje de carga
   const aiMsg = document.createElement('div');
   aiMsg.className = 'msg-ai';
   aiMsg.innerHTML = "Pensando la respuesta... ✨";
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // TU API KEY OFICIAL AQUÍ
   const apiKey = "AIzaSyAQZzVAYHy_9KrgV8k6Gd1VbPWmKob-bZg"; 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -424,12 +410,16 @@ async function sendToAI() {
 
     const data = await response.json();
     
-    if(data.candidates && data.candidates[0].content.parts[0].text) {
+    // AHORA DETECTAMOS EL ERROR EXACTO DE GOOGLE
+    if (data.error) {
+      aiMsg.innerHTML = "<b>¡Uy! Error de Google:</b> " + data.error.message;
+    } 
+    else if(data.candidates && data.candidates[0].content.parts[0].text) {
       const iaResponseText = data.candidates[0].content.parts[0].text;
-      // Reemplazar saltos de línea para que se vean bien en HTML
       aiMsg.innerHTML = iaResponseText.replace(/\n/g, '<br>');
-    } else {
-      aiMsg.innerHTML = "¡Uy! 🌸 Algo raro pasó y no pude calcularlo bien. ¿Me lo repites?";
+    } 
+    else {
+      aiMsg.innerHTML = "<b>¡Uy! Recibí algo extraño:</b> " + JSON.stringify(data);
     }
     
     chatBox.scrollTop = chatBox.scrollHeight;
