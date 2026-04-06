@@ -214,9 +214,9 @@ button:active {
   <div class="ai-container">
     <h3>✨ IA de Kiary ✨</h3>
     <div id="chatBox">
-      <div class="msg-ai">¡Hola, preciosa! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo paso a paso. 🩷🎀</div>
+      <div class="msg-ai">¡Hola! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo de forma fácil y rápida. 🩷✨</div>
     </div>
-    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, hermosa..."></textarea>
+    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí..."></textarea>
     <button class="btn-ai" onclick="sendToAI()">Resolver ✨</button>
   </div>
 </div>
@@ -277,7 +277,7 @@ function calculate(){
 }
 
 function showGlitter() {
-  const emojis = ['🩷', '💖', '✨', '🌸', '🎀', '🥰'];
+  const emojis = ['🩷', '💖', '✨', '🌸', '🎀'];
   for (let i = 0; i < 60; i++) {
     let g = document.createElement('div');
     g.className = 'glitter';
@@ -392,7 +392,7 @@ async function sendToAI() {
 
   const aiMsg = document.createElement('div');
   aiMsg.className = 'msg-ai';
-  aiMsg.innerHTML = "Pensando la respuesta para ti, hermosa... ✨💖";
+  aiMsg.innerHTML = "Calculando... ✨";
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -406,8 +406,8 @@ async function sendToAI() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ 
-          // AQUÍ ESTÁ EL CAMBIO: INSTRUCCIONES MÁS ESTRICTAS PARA QUE SEA BREVE Y NO DIGA SU NOMBRE
-          text: "Eres una asistente virtual dulce y tierna en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE, directa y al grano. NO te presentes ni digas ningún nombre. Trátala con mucho cariño usando emojis lindos (🩷, ✨, 🌸, 🎀). Da la respuesta en máximo 2 o 3 líneas. Aquí está su problema: " + text 
+          // AQUÍ ESTÁ SU NUEVA PERSONALIDAD
+          text: "Eres una asistente virtual (no tienes nombre) creada por Luis Nureña. Estás integrada en una calculadora rosa para ayudar a una dama muy especial. Resuelve su problema matemático de forma MUY BREVE, directa y al grano. NO te presentes ni digas tu nombre. Sé amable y usa un par de emojis lindos (🌸, ✨, 🩷), pero sin ser empalagosa ni exagerada. Si alguna vez te preguntan quién te creó, responde con orgullo que fue Luis Nureña. Tu respuesta debe tener máximo 2 o 3 líneas. Aquí está el problema: " + text 
         }] }]
       })
     });
@@ -415,7 +415,7 @@ async function sendToAI() {
     const data = await response.json();
     
     if (data.error) {
-      aiMsg.innerHTML = "<b>¡Uy, linda! Hubo un problemita:</b> " + data.error.message;
+      aiMsg.innerHTML = "<b>¡Uy! Hubo un problemita:</b> " + data.error.message;
     } 
     else if(data.candidates && data.candidates[0].content.parts[0].text) {
       const iaResponseText = data.candidates[0].content.parts[0].text;
@@ -428,7 +428,7 @@ async function sendToAI() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
   } catch (error) {
-    aiMsg.innerHTML = "¡Ups, preciosa! 🌸 Hubo un problema de conexión. Verifica tu internet y vuelve a intentarlo, por favor. 🎀";
+    aiMsg.innerHTML = "¡Ups! 🌸 Hubo un problema de conexión. Verifica tu internet y vuelve a intentarlo.";
   }
 }
 </script>
