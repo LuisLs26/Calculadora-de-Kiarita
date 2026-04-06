@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Calculadora de Kiara</title>
 
 <style>
@@ -13,26 +13,30 @@
 body {
   background: linear-gradient(180deg, #ffe6f2, #ff99cc);
   font-family: 'Roboto Mono', monospace;
+  color: #c71585;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  overflow: hidden;
 }
 
 .header {
   text-align: center;
-  padding: 20px;
+  padding: 20px 15px;
   background: #ff1493;
   color: white;
-  font-size: 1.6rem;
+  font-size: 1.65rem;
+  font-weight: bold;
 }
 
 .display {
   background: #fff0f5;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   text-align: right;
-  padding: 25px;
-  min-height: 120px;
-  border-bottom: 5px solid #ff1493;
+  padding: 30px 22px;
+  min-height: 130px;
+  border-bottom: 6px solid #ff1493;
+  word-break: break-all;
 }
 
 .buttons {
@@ -40,21 +44,30 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  padding: 15px;
+  padding: 18px;
 }
 
 button {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   border: none;
-  border-radius: 18px;
-  background: #ffb3d1;
-  color: white;
+  border-radius: 22px;
+  box-shadow: 0 6px 12px rgba(255,20,147,0.4);
 }
 
-.operator { background: #ff4da6; }
-.equal { background: #ff1493; }
+button:active {
+  transform: scale(0.92);
+}
+
+.number, .decimal { background: #ffb3d1; color: white; }
+.operator { background: #ff4da6; color: white; }
+.equal { background: #ff1493; color: white; }
 .special { background: #ffe6f2; color: #c71585; }
 .zero { grid-column: span 2; }
+
+.footer {
+  text-align: center;
+  padding: 10px;
+}
 
 #heartContainer {
   position: fixed;
@@ -65,15 +78,12 @@ button {
 
 .heart {
   position: absolute;
-  font-size: 25px;
-  animation: float 2s ease-out forwards;
+  animation: floatHeart 2s forwards;
 }
 
-@keyframes float {
-  to {
-    transform: translateY(-400px);
-    opacity: 0;
-  }
+@keyframes floatHeart {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-400px); opacity: 0; }
 }
 </style>
 </head>
@@ -82,150 +92,136 @@ button {
 
 <div class="header">Calculadora de Kiara</div>
 <div id="display" class="display">0</div>
-<div class="buttons" id="buttons"></div>
+<div class="buttons" id="buttonsContainer"></div>
+<div class="footer">Presiona = ❤️</div>
 <div id="heartContainer"></div>
 
 <script>
 const display = document.getElementById('display');
-const buttons = document.getElementById('buttons');
+const buttonsContainer = document.getElementById('buttonsContainer');
 const heartContainer = document.getElementById('heartContainer');
 
-let current = '0';
-let previous = null;
-let operator = null;
+let currentInput = '0';
+let previousInput = '';
+let operator = '';
 
-// 🎤 VOZ
 const speechMap = {
-  '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
-  '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
-  '+':'más','−':'menos','×':'por','÷':'dividido',
-  '.':'punto','=':'igual','AC':'borrar','+/-':'cambiar signo','%':'porcentaje'
+ '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
+ '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
+ '+':'más','−':'menos','×':'por','÷':'dividido'
 };
 
 function speak(text){
-  if(!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.lang = 'es-ES';
-  msg.rate = 1.05;
-  speechSynthesis.speak(msg);
-}
-
-// 🔥 NORMALIZAR OPERADORES
-function normalize(op){
-  return op==='×'?'*':
-         op==='÷'?'/':
-         op==='−'?'-':op;
+ if(!('speechSynthesis' in window)) return;
+ speechSynthesis.cancel();
+ let u = new SpeechSynthesisUtterance(text);
+ u.lang = 'es-ES';
+ speechSynthesis.speak(u);
 }
 
 function updateDisplay(){
-  if(operator && previous!==null){
-    display.textContent = `${previous} ${operator} ${current}`;
-  } else {
-    display.textContent = current;
-  }
+ if(operator){
+   display.textContent = previousInput + " " + operator + " " + currentInput;
+ } else {
+   display.textContent = currentInput;
+ }
 }
 
 function calculate(){
-  if(previous===null || operator===null) return;
+ let a = parseFloat(previousInput);
+ let b = parseFloat(currentInput);
+ let result;
 
-  let prev=parseFloat(previous);
-  let curr=parseFloat(current);
-  let result;
+ switch(operator){
+   case '+': result = a + b; break;
+   case '−': result = a - b; break;
+   case '×': result = a * b; break;
+   case '÷': result = b === 0 ? 'Error' : a / b; break;
+   case '%': result = b === 0 ? 'Error' : a % b; break;
+ }
 
-  switch(normalize(operator)){
-    case '+': result=prev+curr; break;
-    case '-': result=prev-curr; break;
-    case '*': result=prev*curr; break;
-    case '/': result=curr===0?'Error':prev/curr; break;
-    case '%': result=curr===0?'Error':prev%curr; break;
-  }
+ if(typeof result === "number"){
+   currentInput = Number.isInteger(result) ? result.toString() : result.toFixed(6);
+ } else {
+   currentInput = 'Error';
+ }
 
-  if(typeof result==='number'){
-    current=Number.isInteger(result)?result.toString():result.toFixed(6);
-  } else {
-    current='Error';
-  }
-
-  previous=null;
-  operator=null;
+ operator = '';
+ previousInput = '';
 }
 
 function showHearts(){
-  for(let i=0;i<20;i++){
-    const h=document.createElement('div');
-    h.className='heart';
-    h.textContent='❤️';
-    h.style.left=Math.random()*100+'vw';
-    h.style.bottom='0';
-    heartContainer.appendChild(h);
-    setTimeout(()=>h.remove(),2000);
-  }
+ for(let i=0;i<20;i++){
+   let h=document.createElement('div');
+   h.className='heart';
+   h.innerHTML='❤️';
+   h.style.left=Math.random()*100+'vw';
+   h.style.bottom='0';
+   heartContainer.appendChild(h);
+   setTimeout(()=>h.remove(),2000);
+ }
 }
 
-function press(val){
+function handleButton(val){
 
-  // 🔊 sonido al presionar
-  if(speechMap[val]) speak(speechMap[val]);
+ if(speechMap[val]) speak(speechMap[val]);
 
-  if(!isNaN(val)){
-    current=(current==='0')?val:current+val;
-  }
+ if(!isNaN(val)){
+   currentInput = currentInput === '0' ? val : currentInput + val;
+ }
 
-  else if(val==='.'){
-    if(!current.includes('.')) current+='.';
-  }
+ else if(val === '.'){
+   if(!currentInput.includes('.')) currentInput += '.';
+ }
 
-  else if(['+','−','×','÷','%'].includes(val)){
-    if(operator!==null) calculate();
-    previous=current;
-    operator=val;
-    current='0';
-  }
+ else if(['+','−','×','÷','%'].includes(val)){
+   previousInput = currentInput;
+   operator = val;
+   currentInput = '0';
+ }
 
-  else if(val==='='){
-    calculate();
-    if(current!=='Error'){
-      showHearts();
-      speak('resultado ' + current.replace('.', ' punto '));
-    }
-  }
+ else if(val === '='){
+   if(operator){
+     calculate();
+     showHearts();
+     speak("resultado " + currentInput);
+   }
+ }
 
-  else if(val==='AC'){
-    current='0';
-    previous=null;
-    operator=null;
-  }
+ else if(val === 'AC'){
+   currentInput='0';
+   previousInput='';
+   operator='';
+ }
 
-  else if(val==='+/-'){
-    current=(parseFloat(current)*-1).toString();
-  }
+ else if(val === '+/-'){
+   currentInput = (parseFloat(currentInput)*-1).toString();
+ }
 
-  updateDisplay();
+ updateDisplay();
 }
 
-// BOTONES
-const values=[
-  'AC','+/-','%','÷',
-  '7','8','9','×',
-  '4','5','6','−',
-  '1','2','3','+',
-  '0','.','='
+const values = [
+ 'AC','+/-','%','÷',
+ '7','8','9','×',
+ '4','5','6','−',
+ '1','2','3','+',
+ '0','.','='
 ];
 
 values.forEach(v=>{
-  const b=document.createElement('button');
-  b.textContent=v;
+ let b=document.createElement('button');
+ b.textContent=v;
+ b.onclick=()=>handleButton(v);
 
-  if(!isNaN(v)) b.classList.add('number');
-  else if(['+','−','×','÷'].includes(v)) b.classList.add('operator');
-  else if(v==='=') b.classList.add('equal');
-  else b.classList.add('special');
+ if(v==='0') b.classList.add('zero');
+ if(!isNaN(v)) b.classList.add('number');
+ else if(v==='.') b.classList.add('decimal');
+ else if(['+','−','×','÷'].includes(v)) b.classList.add('operator');
+ else if(v==='=') b.classList.add('equal');
+ else b.classList.add('special');
 
-  if(v==='0') b.classList.add('zero');
-
-  b.onclick=()=>press(v);
-  buttons.appendChild(b);
+ buttonsContainer.appendChild(b);
 });
 
 updateDisplay();
