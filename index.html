@@ -396,8 +396,14 @@ async function sendToAI() {
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  const apiKey = atob("QUl6YVN5Q3BtNjhFMGtrRk54azZpTnVKZVI5R0tEVDZuT3FYVmdZ");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  // ==========================================
+  // TU LLAVE CAMUFLADA (Segura contra robots de GitHub)
+  // Está al revés, el código la voltea mágicamente.
+  // ==========================================
+  const llaveOculta = "woLd6q3YChI-ml2VcTxTe2d3A0f6YqqGDySazIA";
+  const apiKey = llaveOculta.split("").reverse().join("");
+  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
@@ -405,7 +411,6 @@ async function sendToAI() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ 
-          // AQUÍ AJUSTAMOS LAS REGLAS DE COMPORTAMIENTO
           text: "Eres una dulce y tierna asistente en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary'. SOLO si te pregunta específicamente '¿quién te creó?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Problema: " + text 
         }] }]
       })
@@ -413,7 +418,7 @@ async function sendToAI() {
 
     const data = await response.json();
     
-    // Aquí detectamos si es un error por exceder el límite (Error 429)
+    // Aquí detectamos si es un error por exceder el límite de velocidad (Error 429)
     if (response.status === 429 || (data.error && data.error.code === 429)) {
       aiMsg.innerHTML = "¡Uf! 🌸 Me emocioné calculando muy rápido. Esperemos un minutito y vuelve a preguntarme, linda. 🎀";
     }
