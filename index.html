@@ -1,325 +1,219 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Calculadora de Kiara</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Kiara</title>
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(180deg, #ffe6f2, #ff99cc);
-      font-family: 'Roboto Mono', monospace;
-      color: #c71585;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      touch-action: manipulation;
-    }
-    .header {
-      text-align: center;
-      padding: 20px 15px;
-      background: #ff1493;
-      color: white;
-      font-size: 1.65rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .display {
-      background: #fff0f5;
-      color: #c71585;
-      font-size: 2.8rem;
-      text-align: right;
-      padding: 30px 22px;
-      min-height: 130px;
-      border-bottom: 6px solid #ff1493;
-      box-shadow: inset 0 6px 15px rgba(255,20,147,0.3);
-      overflow: hidden;
-      word-break: break-all;
-      text-shadow: 0 2px 4px rgba(199,21,133,0.2);
-    }
-    .buttons {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      padding: 18px;
-      background: transparent;
-    }
-    button {
-      font-size: 1.9rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 22px;
-      box-shadow: 0 6px 12px rgba(255,20,147,0.4);
-      transition: all 0.15s ease;
-      touch-action: manipulation;
-    }
-    button:active {
-      transform: scale(0.92);
-      box-shadow: 0 3px 6px rgba(255,20,147,0.4);
-    }
-    .number, .decimal {
-      background: #ffb3d1;
-      color: #fff;
-    }
-    .operator {
-      background: #ff4da6;
-      color: #fff;
-      font-size: 2.1rem;
-    }
-    .equal {
-      background: #ff1493;
-      color: #fff;
-      font-size: 2.4rem;
-      box-shadow: 0 6px 15px rgba(255,20,147,0.6);
-    }
-    .special {
-      background: #ffe6f2;
-      color: #c71585;
-    }
-    .zero {
-      grid-column: span 2;
-      font-size: 1.9rem;
-    }
-    .footer {
-      text-align: center;
-      padding: 12px;
-      font-size: 0.95rem;
-      color: #c71585;
-      background: rgba(255,255,255,0.3);
-      font-weight: 500;
-    }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
-    /* Corazones flotantes */
-    #heartContainer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 999;
-      overflow: hidden;
-    }
-    .heart {
-      position: absolute;
-      font-size: 28px;
-      color: #ff1493;
-      text-shadow: 0 0 8px #ff69b4;
-      animation: floatHeart 2.2s ease-out forwards;
-      user-select: none;
-    }
-    @keyframes floatHeart {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-420px) scale(0.4) rotate(25deg); opacity: 0; }
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    @media (orientation: landscape) and (max-height: 520px) {
-      .buttons { gap: 7px; padding: 12px; }
-      button { font-size: 1.5rem; border-radius: 16px; }
-      .display { font-size: 2.4rem; min-height: 100px; }
-    }
-  </style>
+body {
+  background: linear-gradient(180deg, #ffe6f2, #ff99cc);
+  font-family: 'Roboto Mono', monospace;
+  color: #c71585;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+  background: #ff1493;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.display {
+  background: #fff0f5;
+  font-size: 2.5rem;
+  text-align: right;
+  padding: 25px;
+  min-height: 120px;
+  border-bottom: 5px solid #ff1493;
+  word-break: break-all;
+}
+
+.buttons {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 15px;
+}
+
+button {
+  font-size: 1.8rem;
+  border: none;
+  border-radius: 18px;
+  background: #ffb3d1;
+  color: white;
+}
+
+.operator { background: #ff4da6; }
+.equal { background: #ff1493; }
+.special { background: #ffe6f2; color: #c71585; }
+.zero { grid-column: span 2; }
+
+#heartContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.heart {
+  position: absolute;
+  font-size: 25px;
+  animation: float 2s ease-out forwards;
+}
+
+@keyframes float {
+  to {
+    transform: translateY(-400px);
+    opacity: 0;
+  }
+}
+</style>
 </head>
+
 <body>
-  <div class="header">Calculadora de Kiara</div>
-  
-  <div id="display" class="display">0</div>
-  
-  <div class="buttons" id="buttonsContainer"></div>
 
-  <div class="footer">
-    Toca los botones → voz en español<br>
-    Presiona = y mira los corazones ❤️
-  </div>
+<div class="header">Calculadora de Kiara</div>
+<div id="display" class="display">0</div>
+<div class="buttons" id="buttons"></div>
+<div id="heartContainer"></div>
 
-  <div id="heartContainer"></div>
+<script>
+const display = document.getElementById('display');
+const buttons = document.getElementById('buttons');
+const heartContainer = document.getElementById('heartContainer');
 
-  <script>
-    const display = document.getElementById('display');
-    const buttonsContainer = document.getElementById('buttonsContainer');
-    const heartContainer = document.getElementById('heartContainer');
-    
-    let currentInput = '0';
-    let previousInput = '';
-    let operator = '';
-    let voiceEnabled = true;
+let current = '0';
+let previous = null;
+let operator = null;
 
-    // Mapeo de voz
-    const speechMap = {
-      '0': 'cero', '1': 'uno', '2': 'dos', '3': 'tres',
-      '4': 'cuatro', '5': 'cinco', '6': 'seis', '7': 'siete',
-      '8': 'ocho', '9': 'nueve', '.': 'punto',
-      '+': 'más', '−': 'menos', '×': 'por', '÷': 'dividido',
-      '%': 'porcentaje', 'AC': 'borrar todo', '+/-': 'más menos'
-    };
+// 🔥 NORMALIZADOR (CLAVE DEL FIX)
+function normalize(op) {
+  return op === '×' ? '*' :
+         op === '÷' ? '/' :
+         op === '−' ? '-' : op;
+}
 
-    function speak(text) {
-      if (!voiceEnabled || !('speechSynthesis' in window)) return;
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-PE';
-      utterance.pitch = 1.05;
-      utterance.rate = 1.1;
-      utterance.volume = 0.95;
-      speechSynthesis.speak(utterance);
-    }
+function updateDisplay() {
+  if (operator && previous !== null) {
+    display.textContent = `${previous} ${operator} ${current}`;
+  } else {
+    display.textContent = current;
+  }
+}
 
-    // Corazones al resultado
-    function showHearts() {
-      for (let i = 0; i < 24; i++) {
-        const heart = document.createElement('span');
-        heart.className = 'heart';
-        heart.textContent = '❤️';
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.bottom = '15%';
-        const size = 22 + Math.random() * 26;
-        heart.style.fontSize = size + 'px';
-        const duration = 1.8 + Math.random() * 1.2;
-        heart.style.animationDuration = duration + 's';
-        heart.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
-        heartContainer.appendChild(heart);
-        setTimeout(() => heart.remove(), duration * 1000 + 300);
-      }
-    }
+function calculate() {
+  if (previous === null || operator === null) return;
 
-    // Mostrar expresión completa (2 + 3) ← esto corrige el problema de "23"
-    function updateDisplay() {
-      let text = currentInput;
-      
-      if (operator) {
-        const symbol = operator === '*' ? '×' : operator === '/' ? '÷' : operator === '-' ? '−' : '+';
-        // Si aún no escribió el segundo número, muestra solo "2 +"
-        if (currentInput === '0') {
-          text = previousInput + ' ' + symbol;
-        } else {
-          text = previousInput + ' ' + symbol + ' ' + currentInput;
-        }
-      } else if (currentInput.length > 12) {
-        text = parseFloat(currentInput).toExponential(4);
-      }
-      
-      display.textContent = text;
-    }
+  let prev = parseFloat(previous);
+  let curr = parseFloat(current);
+  let result;
 
-    function calculate() {
-      if (!operator || !previousInput) return;
-      
-      const prev = parseFloat(previousInput);
-      const curr = parseFloat(currentInput);
-      
-      let result;
-      switch (operator) {
-        case '+': result = prev + curr; break;
-        case '-': result = prev - curr; break;
-        case '*': result = prev * curr; break;
-        case '/': result = curr === 0 ? 'Error' : prev / curr; break;
-        case '%': result = prev % curr || 0; break;
-      }
-      
-      currentInput = (result % 1 === 0) ? result.toString() : parseFloat(result.toFixed(8)).toString();
-      if (currentInput === 'NaN' || currentInput === 'Infinity') currentInput = 'Error';
-      
-      operator = '';
-      previousInput = '';
-    }
+  switch (normalize(operator)) {
+    case '+': result = prev + curr; break;
+    case '-': result = prev - curr; break;
+    case '*': result = prev * curr; break;
+    case '/': result = curr === 0 ? 'Error' : prev / curr; break;
+    case '%': result = curr === 0 ? 'Error' : prev % curr; break;
+  }
 
-    function handleButton(value) {
-      // Voz en todos los botones excepto =
-      if (speechMap[value]) {
-        speak(speechMap[value]);
-      }
+  if (typeof result === 'number') {
+    current = Number.isInteger(result)
+      ? result.toString()
+      : result.toFixed(6);
+  } else {
+    current = 'Error';
+  }
 
-      if (['0','1','2','3','4','5','6','7','8','9'].includes(value)) {
-        if (currentInput === '0' || currentInput === 'Error') {
-          currentInput = value;
-        } else {
-          currentInput += value;
-        }
-      }
-      else if (value === '.') {
-        if (!currentInput.includes('.')) {
-          currentInput += '.';
-        }
-      }
-      else if (['+', '-', '*', '/', '%'].includes(value)) {
-        if (operator) {
-          calculate();
-        }
-        previousInput = currentInput;
-        operator = value === '÷' ? '/' : value === '×' ? '*' : value === '−' ? '-' : value;
-        currentInput = '0';           // ← importante para que se separe correctamente
-      }
-      else if (value === '=') {
-        if (operator) {
-          calculate();
-          if (currentInput !== 'Error') {
-            showHearts();
-            // Voz del resultado (solo aquí)
-            const resultText = currentInput.replace('.', ' punto ');
-            speak('resultado ' + resultText);
-          }
-        }
-      }
-      else if (value === 'AC') {
-        currentInput = '0';
-        previousInput = '';
-        operator = '';
-      }
-      else if (value === '+/-') {
-        if (currentInput !== '0' && currentInput !== 'Error') {
-          currentInput = (parseFloat(currentInput) * -1).toString();
-        }
-      }
+  previous = null;
+  operator = null;
+}
 
-      updateDisplay();
-    }
+function showHearts() {
+  for (let i = 0; i < 20; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = '❤️';
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.bottom = '0';
+    heartContainer.appendChild(h);
+    setTimeout(() => h.remove(), 2000);
+  }
+}
 
-    // Crear botones
-    const buttonValues = [
-      'AC', '+/-', '%', '÷',
-      '7', '8', '9', '×',
-      '4', '5', '6', '−',
-      '1', '2', '3', '+',
-      '0', '.', '='
-    ];
+function press(val) {
 
-    buttonValues.forEach(val => {
-      const btn = document.createElement('button');
-      
-      if (val === '0') btn.classList.add('zero');
-      if (['0','1','2','3','4','5','6','7','8','9'].includes(val)) btn.classList.add('number');
-      else if (val === '.') btn.classList.add('decimal');
-      else if (['÷','×','−','+'].includes(val)) btn.classList.add('operator');
-      else if (val === '=') btn.classList.add('equal');
-      else btn.classList.add('special');
-      
-      btn.textContent = val;
-      btn.dataset.value = val;
-      btn.addEventListener('click', () => handleButton(val));
-      buttonsContainer.appendChild(btn);
-    });
+  if (!isNaN(val)) {
+    current = (current === '0') ? val : current + val;
+  }
 
-    // Teclado físico
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === '=') handleButton('=');
-      else if (e.key === 'Escape') handleButton('AC');
-      else if (['0','1','2','3','4','5','6','7','8','9','+','-','*','/','%','.'].includes(e.key)) {
-        let mapped = e.key;
-        if (e.key === '/') mapped = '÷';
-        if (e.key === '*') mapped = '×';
-        if (e.key === '-') mapped = '−';
-        handleButton(mapped);
-      }
-    });
+  else if (val === '.') {
+    if (!current.includes('.')) current += '.';
+  }
 
-    // Iniciar
-    updateDisplay();
-    console.log('%c✅ Calculadora de Kiara corregida y lista ❤️', 'color:#ff1493; font-size:18px');
-  </script>
+  else if (['+', '−', '×', '÷', '%'].includes(val)) {
+    if (operator !== null) calculate();
+    previous = current;
+    operator = val;
+    current = '0';
+  }
+
+  else if (val === '=') {
+    calculate();
+    if (current !== 'Error') showHearts();
+  }
+
+  else if (val === 'AC') {
+    current = '0';
+    previous = null;
+    operator = null;
+  }
+
+  else if (val === '+/-') {
+    current = (parseFloat(current) * -1).toString();
+  }
+
+  updateDisplay();
+}
+
+// BOTONES
+const values = [
+  'AC','+/-','%','÷',
+  '7','8','9','×',
+  '4','5','6','−',
+  '1','2','3','+',
+  '0','.','='
+];
+
+values.forEach(v => {
+  const b = document.createElement('button');
+  b.textContent = v;
+
+  if (!isNaN(v)) b.classList.add('number');
+  else if (['+','−','×','÷'].includes(v)) b.classList.add('operator');
+  else if (v === '=') b.classList.add('equal');
+  else b.classList.add('special');
+
+  if (v === '0') b.classList.add('zero');
+
+  b.onclick = () => press(v);
+  buttons.appendChild(b);
+});
+
+updateDisplay();
+</script>
+
 </body>
 </html>
