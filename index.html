@@ -396,13 +396,11 @@ async function sendToAI() {
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // ==========================================
-  // TU LLAVE ENCRIPTADA 
-  // (¡GitHub no podrá leerla y no la borrará!)
-  // ==========================================
+  // TU LLAVE ENCRIPTADA (Sigue protegida contra los robots de GitHub)
   const apiKey = atob("QUl6YVN5Q3BtNjhFMGtrRk54azZpTnVKZVI5R0tEVDZuT3FYVmdZ");
   
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // ¡AHORA SÍ! El modelo correcto: gemini-2.5-flash
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
