@@ -137,6 +137,7 @@ button:active {
   padding: 10px;
   border-radius: 15px 15px 0 15px;
   max-width: 80%;
+  word-wrap: break-word;
 }
 
 .msg-ai {
@@ -147,6 +148,7 @@ button:active {
   border-radius: 15px 15px 15px 0;
   max-width: 80%;
   border: 1px solid #ffb3d1;
+  word-wrap: break-word;
 }
 
 .ai-input {
@@ -169,6 +171,8 @@ button:active {
   border-radius: 10px;
   margin-top: 10px;
   font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
 }
 
 /* Efecto de Escarcha Rosada */
@@ -279,32 +283,26 @@ function calculate(){
  previousInput = '';
 }
 
-// EFECTO DE ESCARCHA ROSADA
 function showGlitter() {
   const emojis = ['🩷', '💖', '✨', '🌸', '🎀'];
-  // Crear mucha escarcha (60 elementos)
   for (let i = 0; i < 60; i++) {
     let g = document.createElement('div');
     g.className = 'glitter';
     g.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
     
-    // Iniciar desde el centro-abajo de la pantalla
     g.style.left = '50vw';
     g.style.top = '60vh';
     
-    // Calcular una dirección aleatoria para la explosión
-    let tx = (Math.random() * 400 - 200) + 'px'; // Rango X
-    let ty = (Math.random() * -500 - 100) + 'px'; // Rango Y (hacia arriba)
+    let tx = (Math.random() * 400 - 200) + 'px'; 
+    let ty = (Math.random() * -500 - 100) + 'px'; 
     
     g.style.setProperty('--tx', tx);
     g.style.setProperty('--ty', ty);
     
-    // Tamaño aleatorio para variar la escarcha
     g.style.fontSize = (10 + Math.random() * 20) + 'px';
     
     heartContainer.appendChild(g);
     
-    // Eliminar el elemento después de la animación para no saturar la memoria
     setTimeout(() => g.remove(), 1200);
   }
 }
@@ -320,18 +318,18 @@ function handleButton(val){
  }
  else if(val === '%'){
    currentInput = (parseFloat(currentInput) / 100).toString();
-   showGlitter(); // Escarcha en porcentaje
+   showGlitter();
  }
  else if(['+','−','×','÷'].includes(val)){
    previousInput = currentInput;
    operator = val;
    currentInput = '0';
-   showGlitter(); // Escarcha en operadores
+   showGlitter();
  }
  else if(val === '='){
    if(operator){
      calculate();
-     showGlitter(); // ¡Mucha escarcha en el resultado!
+     showGlitter();
      speak("resultado " + currentInput);
    }
  }
@@ -387,14 +385,14 @@ function switchMode() {
   }
 }
 
-function sendToAI() {
+async function sendToAI() {
   const inputEl = document.getElementById("aiInput");
   const text = inputEl.value.trim();
   if(!text) return;
 
   const chatBox = document.getElementById("chatBox");
 
-  // Mostrar mensaje del usuario
+  // Mensaje del usuario
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
   userMsg.textContent = text;
@@ -402,21 +400,43 @@ function sendToAI() {
   
   inputEl.value = "";
   chatBox.scrollTop = chatBox.scrollHeight;
-  showGlitter(); // Lanza brillitos al preguntar
+  showGlitter();
 
-  // Simular tiempo de espera de la IA
-  setTimeout(() => {
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'msg-ai';
+  // Mensaje de carga
+  const aiMsg = document.createElement('div');
+  aiMsg.className = 'msg-ai';
+  aiMsg.innerHTML = "Pensando la respuesta... ✨";
+  chatBox.appendChild(aiMsg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // TU API KEY OFICIAL AQUÍ
+  const apiKey = "AIzaSyAQZzVAYHy_9KrgV8k6Gd1VbPWmKob-bZg"; 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "Eres Kiary, una asistente amigable y cariñosa en una calculadora rosa. Resuelve este problema matemático paso a paso usando emojis lindos (como 🩷, ✨, 🌸): " + text }] }]
+      })
+    });
+
+    const data = await response.json();
     
-    // NOTA: Para que esto sea real en Github Pages, aquí tendrías que usar "fetch()" 
-    // apuntando a la API de OpenAI o Google Gemini con tu API Key personal.
-    // Como es estático, dejamos una respuesta simulada lista.
-    aiMsg.innerHTML = "¡Qué interesante problema! 🌸 Como ahora estoy funcionando sin una conexión a una base de datos de IA (API Key), no puedo resolverlo de verdad. ¡Pero la interfaz ya está lista para que me conectes cuando quieras! ✨";
+    if(data.candidates && data.candidates[0].content.parts[0].text) {
+      const iaResponseText = data.candidates[0].content.parts[0].text;
+      // Reemplazar saltos de línea para que se vean bien en HTML
+      aiMsg.innerHTML = iaResponseText.replace(/\n/g, '<br>');
+    } else {
+      aiMsg.innerHTML = "¡Uy! 🌸 Algo raro pasó y no pude calcularlo bien. ¿Me lo repites?";
+    }
     
-    chatBox.appendChild(aiMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
-  }, 1000);
+
+  } catch (error) {
+    aiMsg.innerHTML = "¡Ups! 🌸 Hubo un problema de conexión con mi cerebro. Verifica tu internet.";
+  }
 }
 </script>
 
