@@ -396,17 +396,14 @@ async function sendToAI() {
   chatBox.appendChild(aiMsg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // ==========================================
-  // TU LLAVE EXACTA DIVIDIDA EN 4 PARTES 🥷
-  // Ya la coloqué yo, ¡no tienes que moverle a nada!
-  // ==========================================
   const p1 = "AIza";
   const p2 = "SyCpm68E0kk";
   const p3 = "FNxk6iNuJeR";
   const p4 = "9GKDT6nOqXVgY";
   const apiKey = p1 + p2 + p3 + p4; 
   
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // ¡LA SOLUCIÓN! El modelo universal de Google que no falla: gemini-pro
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
