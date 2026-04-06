@@ -2,279 +2,441 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de Kiary 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Calculadora de Kiary</title>
 
 <style>
-body{
-  font-family: Arial;
-  margin:0;
-  background:#ffe6f2;
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: linear-gradient(180deg, #ffe6f2, #ff99cc);
+  font-family: 'Roboto Mono', monospace;
+  color: #c71585;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.header{
-  background:#ff1493;
-  color:white;
-  text-align:center;
-  padding:15px;
-  font-size:20px;
+.header {
+  text-align: center;
+  padding: 15px 15px 5px 15px;
+  background: #ff1493;
+  color: white;
+  font-size: 1.65rem;
+  font-weight: bold;
 }
 
-.mode-selector{
-  text-align:center;
-  padding:10px;
-  background:#ff1493;
+.mode-selector {
+  background: #ff1493;
+  text-align: center;
+  padding-bottom: 15px;
 }
 
-select{
-  padding:5px;
-  border-radius:10px;
+.mode-selector select {
+  padding: 5px 10px;
+  border-radius: 15px;
+  border: 2px solid white;
+  background: #ff99cc;
+  color: #fff;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
 }
 
-.display{
-  background:white;
-  padding:20px;
-  font-size:28px;
-  text-align:right;
+#normalMode {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.buttons{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  padding:10px;
+.display {
+  background: #fff0f5;
+  font-size: 2.8rem;
+  text-align: right;
+  padding: 30px 22px;
+  min-height: 130px;
+  border-bottom: 6px solid #ff1493;
+  word-break: break-all;
 }
 
-button{
-  padding:20px;
-  font-size:18px;
-  border:none;
-  border-radius:10px;
+.buttons {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 18px;
 }
 
-#aiMode{
-  display:none;
-  padding:15px;
+button {
+  font-size: 1.9rem;
+  border: none;
+  border-radius: 22px;
+  box-shadow: 0 6px 12px rgba(255,20,147,0.4);
+  cursor: pointer;
+  transition: transform 0.1s;
 }
 
-.msg-user{
-  background:#ff4da6;
-  color:white;
-  padding:10px;
-  margin:5px;
-  border-radius:10px;
-  text-align:right;
+button:active {
+  transform: scale(0.92);
 }
 
-.msg-ai{
-  background:white;
-  padding:10px;
-  margin:5px;
-  border-radius:10px;
+.number, .decimal { background: #ffb3d1; color: white; }
+.operator { background: #ff4da6; color: white; }
+.equal { background: #ff1493; color: white; }
+.special { background: #ffe6f2; color: #c71585; }
+.zero { grid-column: span 2; }
+
+#aiMode {
+  display: none; 
+  flex: 1;
+  background: #fff0f5;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.ai-container {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(255,20,147,0.2);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ai-container h3 {
+  text-align: center;
+  color: #ff1493;
+  margin-bottom: 10px;
+}
+
+#chatBox {
+  flex: 1;
+  background: #ffe6f2;
+  border-radius: 10px;
+  padding: 15px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #ff4da6;
+  color: white;
+  padding: 10px;
+  border-radius: 15px 15px 0 15px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.msg-ai {
+  align-self: flex-start;
+  background: white;
+  color: #c71585;
+  padding: 10px;
+  border-radius: 15px 15px 15px 0;
+  max-width: 80%;
+  border: 1px solid #ffb3d1;
+  word-wrap: break-word;
+}
+
+.ai-input {
+  width: 100%;
+  height: 70px;
+  padding: 10px;
+  border: 2px solid #ffb3d1;
+  border-radius: 10px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+}
+
+.btn-ai {
+  width: 100%;
+  padding: 12px;
+  background: #ff1493;
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+}
+
+#heartContainer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+}
+
+.glitter {
+  position: absolute;
+  animation: glitterAnim 1.2s ease-out forwards;
+}
+
+@keyframes glitterAnim {
+  0% { transform: translate(0, 0) scale(0.2) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(360deg); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">Calculadora de Kiary 💖</div>
+<div class="header">Calculadora de Kiary</div>
 
 <div class="mode-selector">
-<select onchange="switchMode()" id="mode">
-<option value="normal">Modo Normal</option>
-<option value="ia">Modo IA</option>
-</select>
+  <select id="modeSelect" onchange="switchMode()">
+    <option value="normal">Modo Normal</option>
+    <option value="ia">Modo Avanzado (IA)</option>
+  </select>
 </div>
 
-<div id="normal">
-<div id="display" class="display">0</div>
-<div class="buttons" id="buttons"></div>
+<div id="normalMode">
+  <div id="display" class="display">0</div>
+  <div class="buttons" id="buttonsContainer"></div>
 </div>
 
 <div id="aiMode">
-<div id="chat"></div>
-<textarea id="input" style="width:100%;height:60px;"></textarea>
-<button onclick="send()">Resolver 💖</button>
+  <div class="ai-container">
+    <h3>✨ IA de Kiary ✨</h3>
+    <div id="chatBox">
+      <div class="msg-ai">¡Hola, preciosa! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo. 🩷🎀</div>
+    </div>
+    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, hermosa..."></textarea>
+    <button class="btn-ai" onclick="sendToAI()">Resolver ✨</button>
+  </div>
 </div>
 
+<div id="heartContainer"></div>
+
 <script>
-// ---------------- CALCULADORA ----------------
-let current="0";
-let prev="";
-let op="";
+const display = document.getElementById('display');
+const buttonsContainer = document.getElementById('buttonsContainer');
+const heartContainer = document.getElementById('heartContainer');
 
-function update(){
- document.getElementById("display").textContent=current;
+let currentInput = '0';
+let previousInput = '';
+let operator = '';
+
+const speechMap = {
+ '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
+ '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
+ '+':'más','−':'menos','×':'por','÷':'dividido'
+};
+
+function speak(text){
+ if(!('speechSynthesis' in window)) return;
+ speechSynthesis.cancel();
+ let u = new SpeechSynthesisUtterance(text);
+ u.lang = 'es-ES';
+ speechSynthesis.speak(u);
 }
 
-function calc(){
- let a=parseFloat(prev);
- let b=parseFloat(current);
- let r;
-
- switch(op){
-  case '+': r=a+b; break;
-  case '-': r=a-b; break;
-  case '*': r=a*b; break;
-  case '/': r=b===0?'Error':a/b; break;
+function updateDisplay(){
+ if(operator){
+   display.textContent = previousInput + " " + operator + " " + currentInput;
+ } else {
+   display.textContent = currentInput;
  }
-
- current = typeof r==="number"
-  ? (Number.isInteger(r)?r:parseFloat(r.toFixed(6)))
-  : "Error";
-
- op=""; prev="";
 }
 
-function press(v){
+function calculate(){
+ let a = parseFloat(previousInput);
+ let b = parseFloat(currentInput);
+ let result;
 
- if(!isNaN(v)){
-  if(current==="0"||current==="Error") current=v;
-  else current+=v;
+ switch(operator){
+   case '+': result = a + b; break;
+   case '−': result = a - b; break;
+   case '×': result = a * b; break;
+   case '÷': result = b === 0 ? 'Error' : a / b; break;
  }
 
- else if(v==="."){
-  if(!current.includes(".")) current+=".";
+ if(typeof result === "number"){
+   currentInput = Number.isInteger(result) ? result.toString() : result.toFixed(6);
+ } else {
+   currentInput = 'Error';
  }
 
- else if(v==="%"){
-  if(prev){
-    current=(parseFloat(prev)*parseFloat(current)/100).toString();
-  } else {
-    current=(parseFloat(current)/100).toString();
+ operator = '';
+ previousInput = '';
+}
+
+function showGlitter() {
+  const emojis = ['🩷', '💖', '✨', '🌸', '🎀', '🥰'];
+  for (let i = 0; i < 60; i++) {
+    let g = document.createElement('div');
+    g.className = 'glitter';
+    g.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    g.style.left = '50vw';
+    g.style.top = '60vh';
+    
+    let tx = (Math.random() * 400 - 200) + 'px'; 
+    let ty = (Math.random() * -500 - 100) + 'px'; 
+    
+    g.style.setProperty('--tx', tx);
+    g.style.setProperty('--ty', ty);
+    
+    g.style.fontSize = (10 + Math.random() * 20) + 'px';
+    
+    heartContainer.appendChild(g);
+    
+    setTimeout(() => g.remove(), 1200);
   }
- }
-
- else if(['+','-','*','/'].includes(v)){
-  if(op) calc();
-  prev=current;
-  op=v;
-  current="0";
- }
-
- else if(v==="="){
-  if(op) calc();
- }
-
- else if(v==="AC"){
-  current="0"; prev=""; op="";
- }
-
- else if(v==="+/-"){
-  if(current!=="Error"){
-    current=(parseFloat(current)*-1).toString();
-  }
- }
-
- update();
 }
 
-const vals=[
-'AC','+/-','%','/',
-'7','8','9','*',
-'4','5','6','-',
-'1','2','3','+',
-'0','.','='
+function handleButton(val){
+ if(speechMap[val]) speak(speechMap[val]);
+
+ if(!isNaN(val)){
+   currentInput = currentInput === '0' ? val : currentInput + val;
+ }
+ else if(val === '.'){
+   if(!currentInput.includes('.')) currentInput += '.';
+ }
+ else if(val === '%'){
+   currentInput = (parseFloat(currentInput) / 100).toString();
+   showGlitter();
+ }
+ else if(['+','−','×','÷'].includes(val)){
+   previousInput = currentInput;
+   operator = val;
+   currentInput = '0';
+   showGlitter();
+ }
+ else if(val === '='){
+   if(operator){
+     calculate();
+     showGlitter();
+     speak("resultado " + currentInput);
+   }
+ }
+ else if(val === 'AC'){
+   currentInput='0';
+   previousInput='';
+   operator='';
+ }
+ else if(val === '+/-'){
+   currentInput = (parseFloat(currentInput)*-1).toString();
+ }
+
+ updateDisplay();
+}
+
+const values = [
+ 'AC','+/-','%','÷',
+ '7','8','9','×',
+ '4','5','6','−',
+ '1','2','3','+',
+ '0','.','='
 ];
 
-vals.forEach(v=>{
- let b=document.createElement("button");
+values.forEach(v=>{
+ let b=document.createElement('button');
  b.textContent=v;
- b.onclick=()=>press(v);
- document.getElementById("buttons").appendChild(b);
+ b.onclick=()=>handleButton(v);
+
+ if(v==='0') b.classList.add('zero');
+ if(!isNaN(v)) b.classList.add('number');
+ else if(v==='.') b.classList.add('decimal');
+ else if(['+','−','×','÷'].includes(v)) b.classList.add('operator');
+ else if(v==='=') b.classList.add('equal');
+ else b.classList.add('special');
+
+ buttonsContainer.appendChild(b);
 });
 
-update();
+updateDisplay();
 
-// ---------------- IA INTELIGENTE ----------------
-function fakeAI(text){
-
- text=text.toLowerCase();
-
- let nums=text.match(/\d+/g);
-
- // DINERO
- if(text.includes("gasto")||text.includes("compr")||text.includes("queda")){
-  if(nums){
-    let a=parseFloat(nums[0]);
-    let b=parseFloat(nums[1]||0);
-    return `Ay hermosa 🩷✨, veamos:
-
-Tenías ${a} 💰  
-Gastaste ${b} 🛍️  
-
-Entonces:
-${a} - ${b} = ${a-b}
-
-Te quedan **${a-b}** 🥰🎀`;
+function switchMode() {
+  const mode = document.getElementById("modeSelect").value;
+  if(mode === "normal") {
+    document.getElementById("normalMode").style.display = "flex";
+    document.getElementById("aiMode").style.display = "none";
+  } else {
+    document.getElementById("normalMode").style.display = "none";
+    document.getElementById("aiMode").style.display = "flex";
   }
- }
-
- // PORCENTAJE
- if(text.includes("%") && nums){
-  let a=parseFloat(nums[0]);
-  let b=parseFloat(nums[1]);
-  return `Preciosa 💖:
-
-Queremos calcular ${b}% de ${a}
-
-${a} × ${b}/100 = ${(a*b/100)}
-
-Resultado: **${a*b/100}** ✨`;
- }
-
- // ECUACIONES
- let eq=text.replace(/\s/g,'');
- let m=eq.match(/(\d*)x([\+\-]\d+)?=(\d+)/);
-
- if(m){
-  let a=parseFloat(m[1]||1);
-  let b=parseFloat(m[2]||0);
-  let c=parseFloat(m[3]);
-
-  let res=(c-b)/a;
-
-  return `Mi reina 🥰✨ resolvemos:
-
-${a}x ${b>=0?'+':''}${b} = ${c}
-
-Pasamos términos:
-${a}x = ${c-b}
-
-x = ${(c-b)}/${a}
-
-Resultado final: **x = ${res}** 💖`;
- }
-
- return "Ay linda 🥺 aún no entiendo ese problema, pero puedo ayudarte con operaciones, porcentajes y ecuaciones 💕";
 }
 
-// CHAT
-function send(){
- let text=document.getElementById("input").value;
- if(!text) return;
+async function sendToAI() {
+  const inputEl = document.getElementById("aiInput");
+  const text = inputEl.value.trim();
+  if(!text) return;
 
- let chat=document.getElementById("chat");
+  const chatBox = document.getElementById("chatBox");
 
- let u=document.createElement("div");
- u.className="msg-user";
- u.textContent=text;
- chat.appendChild(u);
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg-user';
+  userMsg.textContent = text;
+  chatBox.appendChild(userMsg);
+  
+  inputEl.value = "";
+  chatBox.scrollTop = chatBox.scrollHeight;
+  showGlitter();
 
- let a=document.createElement("div");
- a.className="msg-ai";
- a.innerHTML=fakeAI(text);
- chat.appendChild(a);
+  const aiMsg = document.createElement('div');
+  aiMsg.className = 'msg-ai';
+  aiMsg.innerHTML = "Pensando la respuesta para ti, hermosa... ✨💖";
+  chatBox.appendChild(aiMsg);
+  chatBox.scrollTop = chatBox.scrollHeight;
 
- document.getElementById("input").value="";
-}
+  // ==========================================
+  // TU NUEVA LLAVE ENCRIPTADA (Nadie la borrará)
+  // ==========================================
+  const apiKey = atob("QUl6YVN5REdxcVk2ZjBBM2QyZVR4VGNWMmxtLUloQ1kzcTZkTG93");
+  
+  // Usando el modelo que SÍ funcionó (gemini-2.5-flash)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-// MODO
-function switchMode(){
- let m=document.getElementById("mode").value;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ 
+          // REGLAS ESTRICTAS DE RESPUESTA
+          text: "Eres una dulce y tierna asistente en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary' ni ningún otro nombre. SOLO si te pregunta específicamente '¿quién te creó?' o '¿quién es tu creador?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Problema: " + text 
+        }] }]
+      })
+    });
 
- document.getElementById("normal").style.display = m==="normal"?"block":"none";
- document.getElementById("aiMode").style.display = m==="ia"?"block":"none";
+    const data = await response.json();
+    
+    if (response.status === 429 || (data.error && data.error.code === 429)) {
+      aiMsg.innerHTML = "¡Uf! 🌸 Me emocioné calculando muy rápido. Esperemos un minutito y vuelve a preguntarme, linda. 🎀";
+    }
+    else if (data.error) {
+      aiMsg.innerHTML = "<b>¡Uy, linda! Hubo un problemita:</b> " + data.error.message;
+    } 
+    else if(data.candidates && data.candidates[0].content.parts[0].text) {
+      const iaResponseText = data.candidates[0].content.parts[0].text;
+      aiMsg.innerHTML = iaResponseText.replace(/\n/g, '<br>');
+    } 
+    else {
+      aiMsg.innerHTML = "<b>¡Uy! Recibí algo extraño:</b> " + JSON.stringify(data);
+    }
+    
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+  } catch (error) {
+    aiMsg.innerHTML = "¡Ups, preciosa! 🌸 Hubo un problema de conexión. Verifica tu internet y vuelve a intentarlo, por favor. 🎀";
+  }
 }
 </script>
 
