@@ -13,10 +13,9 @@
 body {
   background: linear-gradient(180deg, #ffe6f2, #ff99cc);
   font-family: 'Roboto Mono', monospace;
-  color: #c71585;
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 .header {
@@ -25,7 +24,6 @@ body {
   background: #ff1493;
   color: white;
   font-size: 1.6rem;
-  font-weight: bold;
 }
 
 .display {
@@ -35,7 +33,6 @@ body {
   padding: 25px;
   min-height: 120px;
   border-bottom: 5px solid #ff1493;
-  word-break: break-all;
 }
 
 .buttons {
@@ -61,8 +58,6 @@ button {
 
 #heartContainer {
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -99,97 +94,118 @@ let current = '0';
 let previous = null;
 let operator = null;
 
-// 🔥 NORMALIZADOR (CLAVE DEL FIX)
-function normalize(op) {
-  return op === '×' ? '*' :
-         op === '÷' ? '/' :
-         op === '−' ? '-' : op;
+// 🎤 VOZ
+const speechMap = {
+  '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
+  '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
+  '+':'más','−':'menos','×':'por','÷':'dividido',
+  '.':'punto','=':'igual','AC':'borrar','+/-':'cambiar signo','%':'porcentaje'
+};
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = 'es-ES';
+  msg.rate = 1.05;
+  speechSynthesis.speak(msg);
 }
 
-function updateDisplay() {
-  if (operator && previous !== null) {
+// 🔥 NORMALIZAR OPERADORES
+function normalize(op){
+  return op==='×'?'*':
+         op==='÷'?'/':
+         op==='−'?'-':op;
+}
+
+function updateDisplay(){
+  if(operator && previous!==null){
     display.textContent = `${previous} ${operator} ${current}`;
   } else {
     display.textContent = current;
   }
 }
 
-function calculate() {
-  if (previous === null || operator === null) return;
+function calculate(){
+  if(previous===null || operator===null) return;
 
-  let prev = parseFloat(previous);
-  let curr = parseFloat(current);
+  let prev=parseFloat(previous);
+  let curr=parseFloat(current);
   let result;
 
-  switch (normalize(operator)) {
-    case '+': result = prev + curr; break;
-    case '-': result = prev - curr; break;
-    case '*': result = prev * curr; break;
-    case '/': result = curr === 0 ? 'Error' : prev / curr; break;
-    case '%': result = curr === 0 ? 'Error' : prev % curr; break;
+  switch(normalize(operator)){
+    case '+': result=prev+curr; break;
+    case '-': result=prev-curr; break;
+    case '*': result=prev*curr; break;
+    case '/': result=curr===0?'Error':prev/curr; break;
+    case '%': result=curr===0?'Error':prev%curr; break;
   }
 
-  if (typeof result === 'number') {
-    current = Number.isInteger(result)
-      ? result.toString()
-      : result.toFixed(6);
+  if(typeof result==='number'){
+    current=Number.isInteger(result)?result.toString():result.toFixed(6);
   } else {
-    current = 'Error';
+    current='Error';
   }
 
-  previous = null;
-  operator = null;
+  previous=null;
+  operator=null;
 }
 
-function showHearts() {
-  for (let i = 0; i < 20; i++) {
-    const h = document.createElement('div');
-    h.className = 'heart';
-    h.textContent = '❤️';
-    h.style.left = Math.random() * 100 + 'vw';
-    h.style.bottom = '0';
+function showHearts(){
+  for(let i=0;i<20;i++){
+    const h=document.createElement('div');
+    h.className='heart';
+    h.textContent='❤️';
+    h.style.left=Math.random()*100+'vw';
+    h.style.bottom='0';
     heartContainer.appendChild(h);
-    setTimeout(() => h.remove(), 2000);
+    setTimeout(()=>h.remove(),2000);
   }
 }
 
-function press(val) {
+function press(val){
 
-  if (!isNaN(val)) {
-    current = (current === '0') ? val : current + val;
+  // 🔊 sonido al presionar
+  if(speechMap[val]) speak(speechMap[val]);
+
+  if(!isNaN(val)){
+    current=(current==='0')?val:current+val;
   }
 
-  else if (val === '.') {
-    if (!current.includes('.')) current += '.';
+  else if(val==='.'){
+    if(!current.includes('.')) current+='.';
   }
 
-  else if (['+', '−', '×', '÷', '%'].includes(val)) {
-    if (operator !== null) calculate();
-    previous = current;
-    operator = val;
-    current = '0';
+  else if(['+','−','×','÷','%'].includes(val)){
+    if(operator!==null) calculate();
+    previous=current;
+    operator=val;
+    current='0';
   }
 
-  else if (val === '=') {
+  else if(val==='='){
     calculate();
-    if (current !== 'Error') showHearts();
+    if(current!=='Error'){
+      showHearts();
+      speak('resultado ' + current.replace('.', ' punto '));
+    }
   }
 
-  else if (val === 'AC') {
-    current = '0';
-    previous = null;
-    operator = null;
+  else if(val==='AC'){
+    current='0';
+    previous=null;
+    operator=null;
   }
 
-  else if (val === '+/-') {
-    current = (parseFloat(current) * -1).toString();
+  else if(val==='+/-'){
+    current=(parseFloat(current)*-1).toString();
   }
 
   updateDisplay();
 }
 
 // BOTONES
-const values = [
+const values=[
   'AC','+/-','%','÷',
   '7','8','9','×',
   '4','5','6','−',
@@ -197,18 +213,18 @@ const values = [
   '0','.','='
 ];
 
-values.forEach(v => {
-  const b = document.createElement('button');
-  b.textContent = v;
+values.forEach(v=>{
+  const b=document.createElement('button');
+  b.textContent=v;
 
-  if (!isNaN(v)) b.classList.add('number');
-  else if (['+','−','×','÷'].includes(v)) b.classList.add('operator');
-  else if (v === '=') b.classList.add('equal');
+  if(!isNaN(v)) b.classList.add('number');
+  else if(['+','−','×','÷'].includes(v)) b.classList.add('operator');
+  else if(v==='=') b.classList.add('equal');
   else b.classList.add('special');
 
-  if (v === '0') b.classList.add('zero');
+  if(v==='0') b.classList.add('zero');
 
-  b.onclick = () => press(v);
+  b.onclick=()=>press(v);
   buttons.appendChild(b);
 });
 
