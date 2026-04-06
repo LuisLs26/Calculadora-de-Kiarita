@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Calculadora de Kiary ❤️</title>
+<title>Calculadora de Kiary</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
@@ -20,13 +20,40 @@ body {
   overflow: hidden;
 }
 
+/* Cabecera y Selector de Modo */
 .header {
   text-align: center;
-  padding: 20px 15px;
+  padding: 15px 15px 5px 15px;
   background: #ff1493;
   color: white;
   font-size: 1.65rem;
   font-weight: bold;
+}
+
+.mode-selector {
+  background: #ff1493;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+.mode-selector select {
+  padding: 5px 10px;
+  border-radius: 15px;
+  border: 2px solid white;
+  background: #ff99cc;
+  color: #fff;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* --- MODO NORMAL --- */
+#normalMode {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .display {
@@ -66,44 +93,140 @@ button:active {
 .special { background: #ffe6f2; color: #c71585; }
 .zero { grid-column: span 2; }
 
-.footer {
-  text-align: center;
-  padding: 10px;
-  background: #ff99cc;
-  color: #c71585;
-  font-weight: bold;
+/* --- MODO IA AVANZADO --- */
+#aiMode {
+  display: none; 
+  flex: 1;
+  background: #fff0f5;
+  padding: 20px;
+  overflow-y: auto;
 }
 
+.ai-container {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(255,20,147,0.2);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ai-container h3 {
+  text-align: center;
+  color: #ff1493;
+  margin-bottom: 10px;
+}
+
+#chatBox {
+  flex: 1;
+  background: #ffe6f2;
+  border-radius: 10px;
+  padding: 15px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #ff4da6;
+  color: white;
+  padding: 10px;
+  border-radius: 15px 15px 0 15px;
+  max-width: 80%;
+}
+
+.msg-ai {
+  align-self: flex-start;
+  background: white;
+  color: #c71585;
+  padding: 10px;
+  border-radius: 15px 15px 15px 0;
+  max-width: 80%;
+  border: 1px solid #ffb3d1;
+}
+
+.ai-input {
+  width: 100%;
+  height: 70px;
+  padding: 10px;
+  border: 2px solid #ffb3d1;
+  border-radius: 10px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+}
+
+.btn-ai {
+  width: 100%;
+  padding: 12px;
+  background: #ff1493;
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 1.1rem;
+}
+
+/* Efecto de Escarcha Rosada */
 #heartContainer {
   position: fixed;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 100;
+  z-index: 9999;
+  top: 0;
+  left: 0;
 }
 
-.heart {
+.glitter {
   position: absolute;
-  animation: floatHeart ease-in forwards;
+  animation: glitterAnim 1.2s ease-out forwards;
 }
 
-@keyframes floatHeart {
-  0% { transform: translateY(0) scale(0.8); opacity: 1; }
-  50% { transform: translateY(-250px) scale(1.3); opacity: 0.9; }
-  100% { transform: translateY(-600px) scale(1.8); opacity: 0; }
+@keyframes glitterAnim {
+  0% { transform: translate(0, 0) scale(0.2) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(360deg); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">Calculadora de Kiary ❤️</div>
-<div id="display" class="display">0</div>
-<div class="buttons" id="buttonsContainer"></div>
-<div class="footer">¡Mucho amor! ❤️</div>
+<div class="header">Calculadora de Kiary</div>
+
+<div class="mode-selector">
+  <select id="modeSelect" onchange="switchMode()">
+    <option value="normal">Modo Normal</option>
+    <option value="ia">Modo Avanzado (IA)</option>
+  </select>
+</div>
+
+<div id="normalMode">
+  <div id="display" class="display">0</div>
+  <div class="buttons" id="buttonsContainer"></div>
+</div>
+
+<div id="aiMode">
+  <div class="ai-container">
+    <h3>✨ IA de Kiary ✨</h3>
+    <div id="chatBox">
+      <div class="msg-ai">¡Hola! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo paso a paso. 🩷</div>
+    </div>
+    <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí..."></textarea>
+    <button class="btn-ai" onclick="sendToAI()">Resolver ✨</button>
+  </div>
+</div>
+
 <div id="heartContainer"></div>
 
 <script>
+// ==========================================
+// LÓGICA DE LA CALCULADORA NORMAL
+// ==========================================
 const display = document.getElementById('display');
 const buttonsContainer = document.getElementById('buttonsContainer');
 const heartContainer = document.getElementById('heartContainer');
@@ -115,7 +238,7 @@ let operator = '';
 const speechMap = {
  '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
  '5':'cinco','6':'seis','7':'siete','8':'ocho','9':'nueve',
- '+':'más','−':'menos','×':'por','÷':'dividido', '%':'porcentaje'
+ '+':'más','−':'menos','×':'por','÷':'dividido'
 };
 
 function speak(text){
@@ -156,27 +279,34 @@ function calculate(){
  previousInput = '';
 }
 
-function showHearts(){
- // Genera 50 corazones con tamaños, posiciones y velocidades aleatorias
- for(let i=0; i<50; i++){
-   let h = document.createElement('div');
-   h.className = 'heart';
-   h.innerHTML = '❤️';
-   
-   // Posición horizontal aleatoria
-   h.style.left = Math.random() * 100 + 'vw';
-   // Posición vertical ligeramente aleatoria cerca del fondo
-   h.style.bottom = (Math.random() * -30) + 'px';
-   // Tamaños aleatorios entre 15px y 40px
-   h.style.fontSize = (Math.random() * 25 + 15) + 'px';
-   // Velocidad de animación aleatoria entre 1.5s y 3s
-   h.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
-   
-   heartContainer.appendChild(h);
-   
-   // Se eliminan después de que termina la animación
-   setTimeout(() => h.remove(), 3500);
- }
+// EFECTO DE ESCARCHA ROSADA
+function showGlitter() {
+  const emojis = ['🩷', '💖', '✨', '🌸', '🎀'];
+  // Crear mucha escarcha (60 elementos)
+  for (let i = 0; i < 60; i++) {
+    let g = document.createElement('div');
+    g.className = 'glitter';
+    g.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    // Iniciar desde el centro-abajo de la pantalla
+    g.style.left = '50vw';
+    g.style.top = '60vh';
+    
+    // Calcular una dirección aleatoria para la explosión
+    let tx = (Math.random() * 400 - 200) + 'px'; // Rango X
+    let ty = (Math.random() * -500 - 100) + 'px'; // Rango Y (hacia arriba)
+    
+    g.style.setProperty('--tx', tx);
+    g.style.setProperty('--ty', ty);
+    
+    // Tamaño aleatorio para variar la escarcha
+    g.style.fontSize = (10 + Math.random() * 20) + 'px';
+    
+    heartContainer.appendChild(g);
+    
+    // Eliminar el elemento después de la animación para no saturar la memoria
+    setTimeout(() => g.remove(), 1200);
+  }
 }
 
 function handleButton(val){
@@ -190,18 +320,18 @@ function handleButton(val){
  }
  else if(val === '%'){
    currentInput = (parseFloat(currentInput) / 100).toString();
-   showHearts(); // Corazones al presionar %
+   showGlitter(); // Escarcha en porcentaje
  }
  else if(['+','−','×','÷'].includes(val)){
    previousInput = currentInput;
    operator = val;
    currentInput = '0';
-   showHearts(); // Corazones al presionar +, -, ×, ÷
+   showGlitter(); // Escarcha en operadores
  }
  else if(val === '='){
    if(operator){
      calculate();
-     showHearts(); // Corazones al presionar =
+     showGlitter(); // ¡Mucha escarcha en el resultado!
      speak("resultado " + currentInput);
    }
  }
@@ -241,6 +371,53 @@ values.forEach(v=>{
 });
 
 updateDisplay();
+
+// ==========================================
+// LÓGICA DEL MODO IA
+// ==========================================
+
+function switchMode() {
+  const mode = document.getElementById("modeSelect").value;
+  if(mode === "normal") {
+    document.getElementById("normalMode").style.display = "flex";
+    document.getElementById("aiMode").style.display = "none";
+  } else {
+    document.getElementById("normalMode").style.display = "none";
+    document.getElementById("aiMode").style.display = "flex";
+  }
+}
+
+function sendToAI() {
+  const inputEl = document.getElementById("aiInput");
+  const text = inputEl.value.trim();
+  if(!text) return;
+
+  const chatBox = document.getElementById("chatBox");
+
+  // Mostrar mensaje del usuario
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg-user';
+  userMsg.textContent = text;
+  chatBox.appendChild(userMsg);
+  
+  inputEl.value = "";
+  chatBox.scrollTop = chatBox.scrollHeight;
+  showGlitter(); // Lanza brillitos al preguntar
+
+  // Simular tiempo de espera de la IA
+  setTimeout(() => {
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg-ai';
+    
+    // NOTA: Para que esto sea real en Github Pages, aquí tendrías que usar "fetch()" 
+    // apuntando a la API de OpenAI o Google Gemini con tu API Key personal.
+    // Como es estático, dejamos una respuesta simulada lista.
+    aiMsg.innerHTML = "¡Qué interesante problema! 🌸 Como ahora estoy funcionando sin una conexión a una base de datos de IA (API Key), no puedo resolverlo de verdad. ¡Pero la interfaz ya está lista para que me conectes cuando quieras! ✨";
+    
+    chatBox.appendChild(aiMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }, 1000);
+}
 </script>
 
 </body>
