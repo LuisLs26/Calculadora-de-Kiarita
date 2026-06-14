@@ -104,6 +104,87 @@ body {
     border-radius: 0;
     border: none;
   }
+
+  .app-header {
+    padding: 10px 16px 4px 16px;
+  }
+
+  .logo-text {
+    font-size: 1.1rem;
+  }
+
+  .logo-emoji {
+    font-size: 1.15rem;
+  }
+
+  .action-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pill-selector-container {
+    padding: 2px 16px 6px 16px;
+  }
+
+  .pill-btn {
+    padding: 8px 0;
+    font-size: 0.85rem;
+  }
+
+  .lcd-display {
+    padding: 10px 16px;
+    min-height: 80px;
+    gap: 2px;
+  }
+
+  .display-formula {
+    font-size: 0.9rem;
+    min-height: 1.1rem;
+  }
+
+  .buttons {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  button {
+    font-size: 1.35rem;
+    border-radius: 16px;
+  }
+
+  .ai-input-area {
+    padding: 8px 14px 12px 14px;
+    gap: 6px;
+  }
+
+  .ai-input {
+    height: 42px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+  }
+
+  .btn-ai {
+    padding: 9px 0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .chat-box {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .msg-ai, .msg-user {
+    font-size: 0.88rem;
+    padding: 10px 12px;
+  }
+
+  .msg-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
 }
 
 /* Header design */
@@ -666,6 +747,9 @@ let currentInput = '0';
 let previousInput = '';
 let operator = '';
 let isMuted = localStorage.getItem('kiary_muted') === 'true';
+let awaitingOperand = false;
+let lastExpression = '';
+let justCalculated = false;
 
 const speechMap = {
  '0':'cero','1':'uno','2':'dos','3':'tres','4':'cuatro',
@@ -756,21 +840,33 @@ function updateVoiceButton() {
 
 function adjustDisplayFontSize() {
   const len = displayValue.textContent.length;
-  if (len > 12) {
-    displayValue.style.fontSize = '1.8rem';
-  } else if (len > 8) {
-    displayValue.style.fontSize = '2.4rem';
+  const mobile = window.innerWidth <= 480;
+
+  if(mobile) {
+    if (len > 16) displayValue.style.fontSize = '1.1rem';
+    else if (len > 12) displayValue.style.fontSize = '1.4rem';
+    else if (len > 8) displayValue.style.fontSize = '1.9rem';
+    else displayValue.style.fontSize = '2.5rem';
   } else {
-    displayValue.style.fontSize = '3.2rem';
+    if (len > 16) displayValue.style.fontSize = '1.5rem';
+    else if (len > 12) displayValue.style.fontSize = '1.8rem';
+    else if (len > 8) displayValue.style.fontSize = '2.4rem';
+    else displayValue.style.fontSize = '3.2rem';
   }
 }
 
 function updateDisplay(){
   if(operator){
-    displayFormula.textContent = previousInput + " " + operator;
-    displayValue.textContent = currentInput;
+    // Mostrar expresión completa junta: "7 × 8"
+    let expression = previousInput + ' ' + operator;
+    if(!awaitingOperand) {
+      expression += ' ' + currentInput;
+    }
+    displayFormula.textContent = '';
+    displayValue.textContent = expression;
   } else {
-    displayFormula.textContent = "";
+    // Después de = mostrar la expresión anterior arriba y el resultado abajo
+    displayFormula.textContent = lastExpression;
     displayValue.textContent = currentInput;
   }
   adjustDisplayFontSize();
@@ -781,6 +877,9 @@ function calculate(){
   let b = parseFloat(currentInput);
   let result;
 
+  // Guardar la expresión para mostrarla después del resultado
+  lastExpression = previousInput + ' ' + operator + ' ' + currentInput + ' =';
+
   switch(operator){
     case '+': result = a + b; break;
     case '−': result = a - b; break;
@@ -789,7 +888,6 @@ function calculate(){
   }
 
   if(typeof result === "number"){
-    // Formatter to avoid long decimals but keep clean formatting
     currentInput = Number.isInteger(result) ? result.toString() : parseFloat(result.toFixed(6)).toString();
   } else {
     currentInput = 'Error';
@@ -797,6 +895,8 @@ function calculate(){
 
   operator = '';
   previousInput = '';
+  awaitingOperand = false;
+  justCalculated = true;
 }
 
 function showGlitter(event) {
@@ -838,23 +938,48 @@ function handleButton(val, event){
   if(speechMap[val]) speak(speechMap[val]);
 
   if(!isNaN(val)){
-    currentInput = currentInput === '0' ? val : currentInput + val;
+    if(justCalculated) {
+      currentInput = val;
+      lastExpression = '';
+      justCalculated = false;
+    } else if(awaitingOperand) {
+      currentInput = val;
+      awaitingOperand = false;
+    } else {
+      currentInput = currentInput === '0' ? val : currentInput + val;
+    }
   }
   else if(val === '.'){
-    if(!currentInput.includes('.')) currentInput += '.';
+    if(justCalculated) {
+      currentInput = '0.';
+      lastExpression = '';
+      justCalculated = false;
+    } else if(awaitingOperand) {
+      currentInput = '0.';
+      awaitingOperand = false;
+    } else if(!currentInput.includes('.')) {
+      currentInput += '.';
+    }
   }
   else if(val === '%'){
     currentInput = (parseFloat(currentInput) / 100).toString();
+    justCalculated = false;
     showGlitter(event);
   }
   else if(['+','−','×','÷'].includes(val)){
+    if(operator && !awaitingOperand) {
+      // Encadenar operaciones: calcular primero
+      calculate();
+      lastExpression = '';
+    }
     previousInput = currentInput;
     operator = val;
-    currentInput = '0';
+    awaitingOperand = true;
+    justCalculated = false;
     showGlitter(event);
   }
   else if(val === '='){
-    if(operator){
+    if(operator && !awaitingOperand){
       calculate();
       showGlitter(event);
       speak("resultado " + currentInput);
@@ -864,9 +989,13 @@ function handleButton(val, event){
     currentInput='0';
     previousInput='';
     operator='';
+    lastExpression = '';
+    awaitingOperand = false;
+    justCalculated = false;
   }
   else if(val === '+/-'){
     currentInput = (parseFloat(currentInput)*-1).toString();
+    justCalculated = false;
   }
 
   updateDisplay();
@@ -967,7 +1096,8 @@ async function sendToAI() {
   // ==========================================
   const apiKey = atob("bnZhcGktR2VCYzlhUGM4R1Ixa1pzeFhBc2VSQ0hHR0VrWEYtaW1CSDJZMXVtRTVyWUlLaE8tbjMtN3dMR3d5SWhZaExQdg==");
   
-  const url = "https://integrate.api.nvidia.com/v1/chat/completions";
+  const nvidiaUrl = "https://integrate.api.nvidia.com/v1/chat/completions";
+  const url = "https://corsproxy.io/?" + encodeURIComponent(nvidiaUrl);
 
   try {
     const response = await fetch(url, {
