@@ -58,22 +58,23 @@ body {
   display: block;
   pointer-events: none;
   animation: floatUp 15s linear infinite;
-  opacity: 0.5;
+  opacity: 0.4;
+  will-change: transform, opacity;
 }
 
 @keyframes floatUp {
   0% {
-    transform: translateY(105vh) translateX(0) rotate(0deg);
+    transform: translateY(105vh) scale(0.85) rotate(0deg);
     opacity: 0;
   }
   10% {
-    opacity: 0.6;
+    opacity: 0.45;
   }
   90% {
-    opacity: 0.6;
+    opacity: 0.45;
   }
   100% {
-    transform: translateY(-10vh) translateX(var(--drift)) rotate(var(--rot));
+    transform: translateY(-10vh) scale(1.15) rotate(180deg);
     opacity: 0;
   }
 }
@@ -118,6 +119,11 @@ body {
     max-height: 100dvh;
     border-radius: 0;
     border: none;
+    backdrop-filter: none !important; /* Disable heavy blur filters on mobile */
+    -webkit-backdrop-filter: none !important;
+    background: radial-gradient(circle at center, var(--bg-gradient-1), var(--bg-gradient-2));
+    animation: none !important; /* Disable pulsing shadow on mobile */
+    box-shadow: none !important;
   }
 
   .app-header {
@@ -150,6 +156,8 @@ body {
     padding: 8px 16px;
     min-height: 70px;
     gap: 1px;
+    animation: none !important; /* Disable heavy background-position animation */
+    background: rgba(255, 255, 255, 0.55);
   }
 
   .display-formula {
@@ -709,19 +717,11 @@ button:active {
 
 .glitter {
   position: absolute;
-  animation: glitterAnim 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   pointer-events: none;
-}
-
-@keyframes glitterAnim {
-  0% {
-    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--scale, 1.2)) rotate(var(--rot, 360deg));
-    opacity: 0;
-  }
+  transform: translate(-50%, -50%) scale(0.25) rotate(0deg);
+  opacity: 1;
+  transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
 
 /* History Modal Overlay */
@@ -1095,15 +1095,19 @@ function initBackgroundParticles() {
   const container = document.getElementById('bgParticles');
   const emojis = ['🌸', '✨', '🩷', '🎀', '🌸', '✨'];
   
-  for (let i = 0; i < 20; i++) {
+  const isMobile = window.innerWidth <= 480;
+  const initialCount = isMobile ? 6 : 16;
+  const maxCount = isMobile ? 8 : 22;
+
+  for (let i = 0; i < initialCount; i++) {
     createSingleParticle(container, emojis, true);
   }
   
   setInterval(() => {
-    if (container.children.length < 25) {
+    if (container.children.length < maxCount) {
       createSingleParticle(container, emojis, false);
     }
-  }, 3500);
+  }, 4500);
 }
 
 function createSingleParticle(container, emojis, isInitial) {
@@ -1111,7 +1115,7 @@ function createSingleParticle(container, emojis, isInitial) {
   p.className = 'bg-particle';
   p.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
   
-  const size = 12 + Math.random() * 20;
+  const size = 12 + Math.random() * 18;
   p.style.fontSize = size + 'px';
   p.style.left = (Math.random() * 100) + 'vw';
   
@@ -1121,12 +1125,7 @@ function createSingleParticle(container, emojis, isInitial) {
     p.style.top = '105vh';
   }
   
-  const drift = (Math.random() * 220 - 110) + 'px';
-  const rot = (Math.random() * 360 + 180) + 'deg';
-  p.style.setProperty('--drift', drift);
-  p.style.setProperty('--rot', rot);
-  
-  const duration = 12 + Math.random() * 16;
+  const duration = 15 + Math.random() * 15;
   p.style.animationDuration = duration + 's';
   p.style.animationDelay = (Math.random() * -12) + 's';
   
@@ -1236,13 +1235,16 @@ function calculate(){
   justCalculated = true;
 }
 
-function showGlitter(event, count = 35) {
+function showGlitter(event, count = 20) {
+  // DOM Safeguard: strictly limit the number of active particles to prevent memory leaks/GC lags
+  while (heartContainer.children.length > 20) {
+    heartContainer.firstChild.remove();
+  }
+
   const emojis = ['🩷', '💖', '✨', '🌸', '🎀', '🥰'];
-  
   let startX = window.innerWidth / 2;
   let startY = window.innerHeight * 0.6;
   
-  // Use precise click coordinates if the event is available
   if (event && event.clientX && event.clientY) {
     startX = event.clientX;
     startY = event.clientY;
@@ -1256,18 +1258,22 @@ function showGlitter(event, count = 35) {
     g.style.left = startX + 'px';
     g.style.top = startY + 'px';
     
-    let tx = (Math.random() * 320 - 160) + 'px'; 
-    let ty = (Math.random() * -380 - 40) + 'px'; 
-    
-    g.style.setProperty('--tx', tx);
-    g.style.setProperty('--ty', ty);
-    g.style.setProperty('--scale', (0.55 + Math.random() * 0.85));
-    g.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
-    g.style.fontSize = (11 + Math.random() * 16) + 'px';
+    let tx = Math.random() * 240 - 120; 
+    let ty = Math.random() * -280 - 30; 
+    let scale = 0.5 + Math.random() * 0.6;
+    let rot = Math.random() * 360 - 180;
+    let fontSize = 11 + Math.random() * 11;
+    g.style.fontSize = fontSize + 'px';
     
     heartContainer.appendChild(g);
     
-    setTimeout(() => g.remove(), 1200);
+    // Animate style properties in the next frame using GPU compositor transitions
+    requestAnimationFrame(() => {
+      g.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale}) rotate(${rot}deg)`;
+      g.style.opacity = '0';
+    });
+    
+    setTimeout(() => g.remove(), 1000);
   }
 }
 
@@ -1285,7 +1291,7 @@ function handleButton(val, event){
     } else {
       currentInput = currentInput === '0' ? val : currentInput + val;
     }
-    showGlitter(event, 8);
+    showGlitter(event, 5); // Reduced from 8 to prevent RAM lag
   }
   else if(val === '.'){
     if(justCalculated) {
@@ -1298,12 +1304,12 @@ function handleButton(val, event){
     } else if(!currentInput.includes('.')) {
       currentInput += '.';
     }
-    showGlitter(event, 8);
+    showGlitter(event, 5); // Reduced from 8
   }
   else if(val === '%'){
     currentInput = (parseFloat(currentInput) / 100).toString();
     justCalculated = false;
-    showGlitter(event, 35);
+    showGlitter(event, 20); // Reduced from 35
   }
   else if(['+','−','×','÷'].includes(val)){
     if(operator && !awaitingOperand) {
@@ -1315,12 +1321,12 @@ function handleButton(val, event){
     operator = val;
     awaitingOperand = true;
     justCalculated = false;
-    showGlitter(event, 35);
+    showGlitter(event, 20); // Reduced from 35
   }
   else if(val === '='){
     if(operator && !awaitingOperand){
       calculate();
-      showGlitter(event, 35);
+      showGlitter(event, 20); // Reduced from 35
       speak("resultado " + currentInput);
     }
   }
@@ -1336,7 +1342,7 @@ function handleButton(val, event){
   else if(val === '+/-'){
     currentInput = (parseFloat(currentInput)*-1).toString();
     justCalculated = false;
-    showGlitter(event, 8);
+    showGlitter(event, 5); // Reduced from 8
   }
 
   updateDisplay();
