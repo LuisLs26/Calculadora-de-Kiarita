@@ -96,6 +96,18 @@ body {
   position: relative;
   z-index: 10;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: shadowPulse 5s ease-in-out infinite;
+}
+
+@keyframes shadowPulse {
+  0%, 100% {
+    box-shadow: var(--neon-shadow), 0 20px 45px rgba(0, 0, 0, 0.05);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 16px 55px 12px rgba(255, 20, 147, 0.28), 0 25px 50px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -311,7 +323,9 @@ body {
 
 /* Calculator Screen (LCD-like Display) */
 .lcd-display {
-  background: rgba(255, 255, 255, 0.45);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 230, 242, 0.5), rgba(255, 255, 255, 0.6));
+  background-size: 200% 200%;
+  animation: gradientMove 8s ease infinite;
   border-top: 1px solid rgba(255, 255, 255, 0.4);
   border-bottom: 1px solid rgba(255, 105, 180, 0.12);
   padding: 24px;
@@ -323,6 +337,12 @@ body {
   gap: 6px;
   word-break: break-all;
   position: relative;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .display-formula {
@@ -341,6 +361,17 @@ body {
   color: var(--text-dark);
   line-height: 1.15;
   transition: font-size 0.15s ease-out;
+  transform-origin: right center;
+}
+
+.display-value.pop-animate {
+  animation: displayPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+@keyframes displayPop {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 /* Calculator Buttons Layout */
@@ -353,6 +384,29 @@ body {
 
 .mode-content.active-mode {
   display: flex;
+  animation: fadeScaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes buttonEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .buttons {
@@ -1144,6 +1198,11 @@ function updateDisplay(){
     displayValue.textContent = currentInput;
   }
   adjustDisplayFontSize();
+
+  // Play display value pop animation
+  displayValue.classList.remove('pop-animate');
+  void displayValue.offsetWidth; // Trigger reflow
+  displayValue.classList.add('pop-animate');
 }
 
 function calculate(){
@@ -1177,7 +1236,7 @@ function calculate(){
   justCalculated = true;
 }
 
-function showGlitter(event) {
+function showGlitter(event, count = 35) {
   const emojis = ['🩷', '💖', '✨', '🌸', '🎀', '🥰'];
   
   let startX = window.innerWidth / 2;
@@ -1189,7 +1248,7 @@ function showGlitter(event) {
     startY = event.clientY;
   }
   
-  for (let i = 0; i < 45; i++) {
+  for (let i = 0; i < count; i++) {
     let g = document.createElement('div');
     g.className = 'glitter';
     g.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
@@ -1226,6 +1285,7 @@ function handleButton(val, event){
     } else {
       currentInput = currentInput === '0' ? val : currentInput + val;
     }
+    showGlitter(event, 8);
   }
   else if(val === '.'){
     if(justCalculated) {
@@ -1238,11 +1298,12 @@ function handleButton(val, event){
     } else if(!currentInput.includes('.')) {
       currentInput += '.';
     }
+    showGlitter(event, 8);
   }
   else if(val === '%'){
     currentInput = (parseFloat(currentInput) / 100).toString();
     justCalculated = false;
-    showGlitter(event);
+    showGlitter(event, 35);
   }
   else if(['+','−','×','÷'].includes(val)){
     if(operator && !awaitingOperand) {
@@ -1254,12 +1315,12 @@ function handleButton(val, event){
     operator = val;
     awaitingOperand = true;
     justCalculated = false;
-    showGlitter(event);
+    showGlitter(event, 35);
   }
   else if(val === '='){
     if(operator && !awaitingOperand){
       calculate();
-      showGlitter(event);
+      showGlitter(event, 35);
       speak("resultado " + currentInput);
     }
   }
@@ -1270,10 +1331,12 @@ function handleButton(val, event){
     lastExpression = '';
     awaitingOperand = false;
     justCalculated = false;
+    showGlitter(event, 10);
   }
   else if(val === '+/-'){
     currentInput = (parseFloat(currentInput)*-1).toString();
     justCalculated = false;
+    showGlitter(event, 8);
   }
 
   updateDisplay();
@@ -1287,7 +1350,7 @@ const values = [
  '0','.','='
 ];
 
-values.forEach(v=>{
+values.forEach((v, index)=>{
   let b=document.createElement('button');
   b.textContent=v;
   b.onclick=(e)=>handleButton(v, e);
@@ -1298,6 +1361,11 @@ values.forEach(v=>{
   else if(['+','−','×','÷'].includes(v)) b.classList.add('operator');
   else if(v==='=') b.classList.add('equal');
   else b.classList.add('special');
+
+  // Fade-in cascade transition on load
+  b.style.opacity = '0';
+  b.style.animation = 'buttonEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+  b.style.animationDelay = (index * 15) + 'ms';
 
   buttonsContainer.appendChild(b);
 });
