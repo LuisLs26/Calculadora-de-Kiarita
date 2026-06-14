@@ -963,22 +963,33 @@ async function sendToAI() {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   // ==========================================
-  // TU NUEVA LLAVE ENCRIPTADA (Nadie la borrará)
+  // NVIDIA NIM API Key (ofuscada con base64)
   // ==========================================
-  const apiKey = atob("QUl6YVN5REdxcVk2ZjBBM2QyZVR4VGNWMmxtLUloQ1kzcTZkTG93");
+  const apiKey = atob("bnZhcGktR2VCYzlhUGM4R1Ixa1pzeFhBc2VSQ0hHR0VrWEYtaW1CSDJZMXVtRTVyWUlLaE8tbjMtN3dMR3d5SWhZaExQdg==");
   
-  // Usando el modelo que SÍ funcionó (gemini-2.5-flash)
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = "https://integrate.api.nvidia.com/v1/chat/completions";
 
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ 
-          // REGLAS ESTRICTAS DE RESPUESTA
-          text: "Eres una dulce y tierna asistente en una calculadora rosa. Estás ayudando a una dama muy especial. Resuelve este problema matemático de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary' ni ningún otro nombre. SOLO si te pregunta específicamente '¿quién te creó?' o '¿quién es tu creador?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Problema: " + text 
-        }] }]
+        model: "meta/llama-3.1-8b-instruct",
+        messages: [
+          {
+            role: "system",
+            content: "Eres una dulce y tierna asistente en una calculadora rosa llamada Kiary. Estás ayudando a una dama muy especial. Resuelve problemas matemáticos de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary' ni ningún otro nombre. SOLO si te pregunta específicamente '¿quién te creó?' o '¿quién es tu creador?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Responde siempre en español."
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.7
       })
     });
 
@@ -1001,14 +1012,15 @@ async function sendToAI() {
     aiMsgContainer.appendChild(aiMsg);
     chatBox.appendChild(aiMsgContainer);
 
-    if (response.status === 429 || (data.error && data.error.code === 429)) {
-      aiMsg.innerHTML = "¡Uf! 🌸 Me emocioné calculando muy rápido. Esperemos un minutito y vuelve a preguntarme, linda. 🎀";
+    if (response.status === 429) {
+      aiMsg.innerHTML = "¡Uf! 🌸 Me emocioné calculando muy rápido. Esperemos un momentito y vuelve a preguntarme, linda. 🎀";
     }
-    else if (data.error) {
-      aiMsg.innerHTML = "<b>¡Uy, linda! Hubo un problemita:</b> " + data.error.message;
+    else if (!response.ok || data.error) {
+      const errMsg = data.error ? (data.error.message || JSON.stringify(data.error)) : ("Error " + response.status);
+      aiMsg.innerHTML = "<b>¡Uy, linda! Hubo un problemita:</b> " + errMsg;
     } 
-    else if(data.candidates && data.candidates[0].content.parts[0].text) {
-      const iaResponseText = data.candidates[0].content.parts[0].text;
+    else if(data.choices && data.choices.length > 0 && data.choices[0].message) {
+      const iaResponseText = data.choices[0].message.content;
       aiMsg.innerHTML = iaResponseText.replace(/\n/g, '<br>');
     } 
     else {

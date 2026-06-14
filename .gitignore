@@ -1,0 +1,9 @@
+# API Keys - NEVER upload to GitHub
+APIKEY NVIDIA.txt
+*.key
+*.env
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
