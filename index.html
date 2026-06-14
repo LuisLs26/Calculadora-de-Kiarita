@@ -153,7 +153,7 @@ body {
   }
 
   .ai-input-area {
-    padding: 8px 14px 12px 14px;
+    padding: 8px 14px 34px 14px; /* Extra padding for Android nav bar */
     gap: 6px;
   }
 
@@ -713,7 +713,7 @@ button:active {
       <div id="chatBox" class="chat-box">
         <div class="msg-container msg-ai-container">
           <div class="msg-avatar">✨</div>
-          <div class="msg-ai">¡Hola, preciosa! Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo. 🩷🎀</div>
+          <div class="msg-ai">¡Hola Kiaris! ✨ Escribe cualquier problema de matemáticas que tengas y te ayudaré a resolverlo.</div>
         </div>
       </div>
       
@@ -728,7 +728,7 @@ button:active {
       </div>
 
       <div class="ai-input-area">
-        <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, hermosa..." onkeydown="handleAIInputKey(event)"></textarea>
+        <textarea id="aiInput" class="ai-input" placeholder="Escribe tu problema aquí, Kiaris..." onkeydown="handleAIInputKey(event)"></textarea>
         <button class="btn-ai" onclick="sendToAI()">Resolver ✨</button>
       </div>
     </div>
@@ -1111,7 +1111,7 @@ async function sendToAI() {
         messages: [
           {
             role: "system",
-            content: "Eres una dulce y tierna asistente en una calculadora rosa llamada Kiary. Estás ayudando a una dama muy especial. Resuelve problemas matemáticos de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. NO digas 'soy Kiary' ni ningún otro nombre. SOLO si te pregunta específicamente '¿quién te creó?' o '¿quién es tu creador?' responde con orgullo que tu creador es Luis Nureña; si no te lo pregunta, NO LO MENCIONES EN ABSOLUTO. Trátala con cariño usando emojis (🩷, ✨, 🌸, 🎀). Responde siempre en español."
+            content: "Eres una asistente en una calculadora rosa. Estás ayudando a una chica llamada Kiara. Llámala cariñosamente Kiaris, Kiary o Kiarita. Sé amigable pero no demasiado melosa o empalagosa. Resuelve problemas matemáticos de forma MUY BREVE y directa (máximo 2 o 3 líneas). REGLAS: NO te presentes. SOLO si te pregunta específicamente '¿quién te creó?' o '¿quién es tu creador?' responde con orgullo que tu creador es Luis Nureña; de lo contrario no lo menciones. Usa emojis moderadamente (✨, 🌸). Responde siempre en español."
           },
           {
             role: "user",
